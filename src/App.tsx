@@ -1,6 +1,16 @@
+import {createHashRouter, RouterProvider} from "react-router-dom";
+import {DefaultPage} from "./pages";
+
+const router = createHashRouter([
+    {
+        path: "/",
+        element: <DefaultPage/>
+    }
+])
+
 export const App = () => {
     return (
-        <h1>Kogito Workflows UI</h1>
+        <RouterProvider router={router}/>
     );
 };
 
