@@ -1,4 +1,4 @@
-import {FC} from "react";
+import {FC, useState} from "react";
 import {useServerConfigurations} from "../shared/useServerConfiguration.tsx";
 import {
     Button,
@@ -17,6 +17,7 @@ export type ServerConfigurationSelectionProps = {
 
 export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps> = ({onSelect}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const [deleteEnabled, setDeleteEnabled] = useState(false);
     const [configurations, setConfigurations] = useServerConfigurations();
 
     const addConfiguration = (configuration: ServerConfiguration) => {
@@ -30,18 +31,25 @@ export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps>
         }
     };
 
+    const toggleDeleteEnabled = () => setDeleteEnabled(current => !current);
+
     return (
         <>
-            <Flex mb={10} alignSelf={"stretch"} alignItems="center" justifyContent="center" gap={10}>
+            <Flex alignSelf={"stretch"} alignItems="center" justifyContent="center" gap={10}>
                 {configurations.map((configuration) =>
-                    <ButtonGroup size="lg" isAttached colorScheme="blue" key={configuration.id}>
+                    <ButtonGroup size="lg" isAttached colorScheme={deleteEnabled ? "gray" : "blue"} key={configuration.id}>
                         <Button onClick={() => onSelect(configuration.id)}>{configuration.name}</Button>
-                        <IconButton aria-label='Forget this connection' icon={<SmallCloseIcon/>} onClick={() => deleteConfiguration(configuration)}/>
+                        {deleteEnabled && <IconButton colorScheme="red" aria-label='Forget this connection' icon={<SmallCloseIcon/>} onClick={() => deleteConfiguration(configuration)}/>}
                     </ButtonGroup>
                 )}
             </Flex>
 
-            <Button onClick={onOpen} variant="outline">Configure a new server connection</Button>
+            <Flex my={10}>
+                <Button onClick={onOpen} variant="outline">Configure a new server connection</Button>
+                <Button ml={5} onClick={toggleDeleteEnabled} variant="outline">
+                    {deleteEnabled ? "Finish editing" : "Edit connections"}
+                </Button>
+            </Flex>
 
             <ServerConfigurationModal isOpen={isOpen} onClose={onClose} onSubmit={addConfiguration}/>
         </>
