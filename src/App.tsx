@@ -2,6 +2,7 @@ import {createHashRouter, RouterProvider} from "react-router-dom";
 import {DefaultPage} from "./pages";
 import {ChakraProvider} from "@chakra-ui/react";
 import {ServerPage} from "./pages/server.tsx";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 const router = createHashRouter([
     {
@@ -14,10 +15,14 @@ const router = createHashRouter([
     }
 ])
 
+const client = new QueryClient();
+
 export const App = () => {
     return (
         <ChakraProvider>
-            <RouterProvider router={router}/>
+            <QueryClientProvider client={client}>
+                <RouterProvider router={router}/>
+            </QueryClientProvider>
         </ChakraProvider>
     );
 };
