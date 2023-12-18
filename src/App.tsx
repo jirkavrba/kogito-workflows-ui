@@ -1,6 +1,7 @@
 import {createHashRouter, RouterProvider} from "react-router-dom";
 import {DefaultPage} from "./pages";
 import {ChakraProvider} from "@chakra-ui/react";
+import {ServerPage} from "./pages/server.tsx";
 
 const router = createHashRouter([
     {
@@ -8,8 +9,8 @@ const router = createHashRouter([
         element: <DefaultPage/>
     },
     {
-        path: "/server/:id",
-        element: <div>Connected</div>
+        path: "/server/:connection",
+        element: <ServerPage/>
     }
 ])
 
