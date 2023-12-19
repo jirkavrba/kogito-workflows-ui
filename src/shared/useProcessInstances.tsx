@@ -2,9 +2,6 @@ import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {gql, GraphQLClient} from "graphql-request";
 import {useQuery} from "@tanstack/react-query";
 
-export type AggregatedProcessInstancesRequest = {
-    offset: number;
-}
 
 export type AggregatedProcessInstancesResponse = {
     instances: Array<AggregatedProcessInstance>
@@ -24,18 +21,48 @@ export type AggregatedProcessInstance = {
     error: ProcessInstanceError | null;
 }
 
+export type AggregatedProcessInstancesRequest = {
+    offset: number;
+    nameQuery: string;
+    businessKeyQuery: string;
+    states: Array<string>;
+}
 
-export const useProcessInstances = (configuration: ServerConfiguration, offset: number = 0) => {
+const defaultRequest: AggregatedProcessInstancesRequest = {
+    offset: 0,
+    businessKeyQuery: "*",
+    nameQuery: "*",
+    states: [
+        "ABORTED",
+        "ACTIVE",
+        "COMPLETED",
+        "ERROR",
+        "SUSPENDED",
+    ]
+};
+
+export const useProcessInstances = (configuration: ServerConfiguration, request: AggregatedProcessInstancesRequest = defaultRequest) => {
     const client = new GraphQLClient(configuration.url)
     return useQuery({
-        queryKey: [`instances#${configuration.id}`],
+        queryKey: [`instances#${configuration.id}`, request],
         queryFn: async () => {
             return await client.request<
                 AggregatedProcessInstancesResponse,
                 AggregatedProcessInstancesRequest
             >(gql`
-                query getProcessInstances($offset: Int) {
+                query getProcessInstances($offset: Int, $nameQuery: String, $businessKeyQuery: String, $states: [ProcessInstanceState]) {
                   instances: ProcessInstances(
+                      where: {
+                        processName: {
+                          like: $nameQuery
+                        },
+                        businessKey: {
+                          like: $businessKeyQuery
+                        },
+                        state: {
+                          in: $states
+                        }
+                      },
                       orderBy: {
                         lastUpdate: DESC 
                       },
@@ -55,7 +82,7 @@ export const useProcessInstances = (configuration: ServerConfiguration, offset: 
                     }
                   }
                 }
-            `, { offset })
+            `, request)
         }
     })
 }
