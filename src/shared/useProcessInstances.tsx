@@ -7,16 +7,21 @@ export type AggregatedProcessInstancesRequest = {
 }
 
 export type AggregatedProcessInstancesResponse = {
-    ProcessInstances: Array<AggregatedProcessInstance>
+    instances: Array<AggregatedProcessInstance>
+}
+
+export type ProcessInstanceError = {
+    message: string;
 }
 
 export type AggregatedProcessInstance = {
     id: string;
-    name: string;
-    key: string | null;
+    processName: string;
+    businessKey: string | null;
     state: string;
     start: string;
     lastUpdate: string;
+    error: ProcessInstanceError | null;
 }
 
 
@@ -40,11 +45,14 @@ export const useProcessInstances = (configuration: ServerConfiguration, offset: 
                       }
                   ) {
                     id
-                    name: processName
-                    key: businessKey
+                    processName
+                    businessKey
                     state
                     start
                     lastUpdate
+                    error {
+                        message
+                    }
                   }
                 }
             `, { offset })
