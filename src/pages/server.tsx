@@ -4,18 +4,19 @@ import {useServerConfiguration} from "../shared/useServerConfiguration.tsx";
 import {ServerNavbar} from "../components/ServerNavbar.tsx";
 import {useProcessInstances} from "../shared/useProcessInstances.tsx";
 import {Spinner} from "@chakra-ui/react";
+import {ConnectionError} from "../components/ConnectionError.tsx";
 
 export const ServerPage: FC = () => {
     const {connection} = useParams();
     const configuration = useServerConfiguration(connection ?? "");
-    const {data: processes, isLoading} = useProcessInstances(configuration);
+    const {data: processes, isLoading, error} = useProcessInstances(configuration);
 
     return (
         <>
             <ServerNavbar configuration={configuration} />
             <main>
+            { error !== null && <ConnectionError />}
             {
-                // TODO: Error handling
                 isLoading
                 ? <Spinner/>
                 : JSON.stringify(processes)
