@@ -1,56 +1,54 @@
 import {FC} from "react";
 import {AggregatedProcessInstance} from "../shared/useProcessInstances.tsx";
-import {Card, CardBody, Code, Flex, Heading, Stack, Tag, TagLabel, Text} from "@chakra-ui/react";
 import {NavLink} from "react-router-dom";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
-import {processInstanceStateColor} from "../shared/helpers.ts";
-import {ProcessInstancesFilter} from "./ProcessInstancesFilter.tsx";
+import {Card, CardBody, Chip} from "@nextui-org/react";
+
+const stateTextColors = {
+    "ACTIVE": "text-success",
+    "COMPLETED": "text-default",
+    "ERROR": "text-danger",
+};
+
+const stateBorderColors = {
+    "ACTIVE": "border-success",
+    "COMPLETED": "border-default",
+    "ERROR": "border-danger",
+};
 
 const ProcessInstanceItem: FC<AggregatedProcessInstance> = ({id, processName, businessKey, state, start, lastUpdate, error}) => {
-    const color = processInstanceStateColor(state);
     return (
-        <Card variant="filled" borderLeftColor={`${color}.500`} borderLeftWidth={5}>
+        <Card className={`${stateBorderColors[state]} border-l-2`}>
             <CardBody>
-                <Flex justifyContent="space-between" alignItems="center">
-                    <Flex justifyContent="start" alignItems="center" flexGrow={1} gap={2}>
-                        <Flex direction="column" justifyContent="start" alignItems="start" gap={2}>
-                            <Flex direction="row" justifyContent="start" alignItems="center" gap={2}>
-                                <Heading size="sm">
-                                    {processName}
-                                </Heading>
-                                <Tag colorScheme={color} size="sm" rounded="full" variant="solid">
-                                    <ProcessInstanceStateIcon state={state} size={12}/>
-                                    <TagLabel ml={2}>
-                                        {state}
-                                    </TagLabel>
-                                </Tag>
-                            </Flex>
-                            {businessKey !== null
-                                ? (
-                                    <Tag colorScheme={"purple"} rounded={"full"} size={"sm"}>
-                                        <TagLabel>{businessKey}</TagLabel>
-                                    </Tag>
-                                )
-                                : (
-                                    <Tag colorScheme={"blue"} rounded={"full"} size={"sm"}>
-                                        <TagLabel>{id}</TagLabel>
-                                    </Tag>
-                                )
-                            }
-                            {error && (
-                                <Code fontSize="xs">
-                                    {error.message}
-                                </Code>
-                            )}
-                        </Flex>
-                    </Flex>
-                    <Flex direction="column" justifyContent="start" alignItems="end" gap={2}>
-                        Started at {start}
-                        <Text align="right">
-                            Last updated at {lastUpdate}
-                        </Text>
-                    </Flex>
-                </Flex>
+                <div className="flex flex-col items-start justify-start gap-2">
+                    <div className="flex flex-row items-start justify-between">
+                        <div className="flex flex-col items-start justify-start gap-2">
+                            <div className={`flex flex-row items-center gap-2 text-xs ${stateTextColors[state]}`}>
+                                <ProcessInstanceStateIcon state={state} size={12}/>
+                                {state}
+                            </div>
+                            <h1 className="text-lg font-bold">{processName}</h1>
+                        </div>
+                    </div>
+                    {businessKey !== null
+                        ? (
+                            <Chip color="default" size="sm">
+                                {businessKey}
+                            </Chip>
+                        )
+                        : (
+                            <Chip color="primary" size="sm">
+                                {id}
+                            </Chip>
+                        )
+                    }
+                </div>
+
+                {error && (
+                    <div className="bg-default-100 my-2 p-2 rounded-lg text-xs text-danger font-mono">
+                        {error.message}
+                    </div>
+                )}
             </CardBody>
         </Card>
     )
@@ -62,9 +60,11 @@ export type ProcessInstancesListingProps = {
 
 export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({instances}) => {
     return (
-        <Flex>
-            <ProcessInstancesFilter onUpdate={console.log} />
-            <Stack spacing={5} padding={10}>
+        <div className="flex flex-row gap-4 p-4">
+            <div className="flex-[1]">
+                <h1>Filters</h1>
+            </div>
+            <div className="flex-[2] flex flex-col items-stretch justify-start gap-4">
                 {
                     instances.map(instance =>
                         <NavLink to={`instance/${instance.id}`} key={instance.id}>
@@ -72,7 +72,7 @@ export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({insta
                         </NavLink>
                     )
                 }
-            </Stack>
-        </Flex>
+            </div>
+        </div>
     )
 };

@@ -1,5 +1,4 @@
 import {FC} from "react";
-import {Divider, Flex, Heading} from "@chakra-ui/react";
 import {ServerConfigurationSelection} from "../components/ServerConfigurationSelection.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -10,14 +9,10 @@ export const DefaultPage: FC = () => {
     };
 
     return (
-        <>
-            <Flex direction="column" justifyContent="center" alignItems="center" padding={20}>
-                <Heading>Kogito Workflows UI</Heading>
+        <div className="flex flex-col items-center justify-center w-screen h-screen">
+            <h1 className="text-4xl font-bold mb-10">Kogito Workflows UI</h1>
 
-                <Divider margin={10}/>
-
-                <ServerConfigurationSelection onSelect={onServerConfigurationSelected}/>
-            </Flex>
-        </>
+            <ServerConfigurationSelection onSelect={onServerConfigurationSelected}/>
+        </div>
     )
 };

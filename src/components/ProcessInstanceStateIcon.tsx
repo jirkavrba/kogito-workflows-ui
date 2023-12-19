@@ -1,5 +1,5 @@
 import {FC} from "react";
-import FeatherIcon from "feather-icons-react";
+import {CgBolt, CgChevronDoubleRightO, CgCloseO} from "react-icons/cg";
 
 export type ProcessInstanceStatusIconProps = {
     state: string;
@@ -9,15 +9,15 @@ export type ProcessInstanceStatusIconProps = {
 export const ProcessInstanceStateIcon: FC<ProcessInstanceStatusIconProps> = ({ state, size = 16}) => {
     switch (state) {
         case "ACTIVE":
-            return <FeatherIcon icon={"activity"} width={size} height={size}/>;
+            return <CgBolt width={size} height={size}/>
 
         case "COMPLETED":
-            return <FeatherIcon icon={"check-circle"} width={size} height={size}/>;
+            return <CgChevronDoubleRightO width={size} height={size} />
 
         case "ERROR":
-            return <FeatherIcon icon={"alert-circle"} width={size} height={size}/>;
+            return <CgCloseO width={size} height={size} />
 
         default:
-            return <FeatherIcon icon={"help-circle"} width={size} height={size}/>;
+            return <></>
     }
 }

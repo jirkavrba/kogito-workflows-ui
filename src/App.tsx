@@ -1,29 +1,23 @@
-import {createHashRouter, RouterProvider} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import {DefaultPage} from "./pages";
-import {ChakraProvider} from "@chakra-ui/react";
 import {ServerPage} from "./pages/server.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-
-const router = createHashRouter([
-    {
-        path: "/",
-        element: <DefaultPage/>
-    },
-    {
-        path: "/server/:connection",
-        element: <ServerPage/>
-    }
-])
+import {NextUIProvider} from "@nextui-org/react";
 
 const client = new QueryClient();
 
 export const App = () => {
+    // const navigate = useNavigate();
+
     return (
-        <ChakraProvider>
+        <NextUIProvider>
             <QueryClientProvider client={client}>
-                <RouterProvider router={router}/>
+                <Routes>
+                    <Route path="/server/:connection" element={<ServerPage/>}/>
+                    <Route path="/" element={<DefaultPage/>}/>
+                </Routes>
             </QueryClientProvider>
-        </ChakraProvider>
+        </NextUIProvider>
     );
 };
 

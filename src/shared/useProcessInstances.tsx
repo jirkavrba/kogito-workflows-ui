@@ -23,15 +23,11 @@ export type AggregatedProcessInstance = {
 
 export type AggregatedProcessInstancesRequest = {
     offset: number;
-    nameQuery: string;
-    businessKeyQuery: string;
     states: Array<string>;
 }
 
 const defaultRequest: AggregatedProcessInstancesRequest = {
     offset: 0,
-    businessKeyQuery: "*",
-    nameQuery: "*",
     states: [
         "ABORTED",
         "ACTIVE",
@@ -50,15 +46,9 @@ export const useProcessInstances = (configuration: ServerConfiguration, request:
                 AggregatedProcessInstancesResponse,
                 AggregatedProcessInstancesRequest
             >(gql`
-                query getProcessInstances($offset: Int, $nameQuery: String, $businessKeyQuery: String, $states: [ProcessInstanceState]) {
+                query getProcessInstances($offset: Int, $states: [ProcessInstanceState]) {
                   instances: ProcessInstances(
                       where: {
-                        processName: {
-                          like: $nameQuery
-                        },
-                        businessKey: {
-                          like: $businessKeyQuery
-                        },
                         state: {
                           in: $states
                         }

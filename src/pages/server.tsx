@@ -3,15 +3,15 @@ import {useParams} from "react-router-dom";
 import {useServerConfiguration} from "../shared/useServerConfiguration.tsx";
 import {ServerNavbar} from "../components/ServerNavbar.tsx";
 import {useProcessInstances} from "../shared/useProcessInstances.tsx";
-import {Flex, Spinner} from "@chakra-ui/react";
 import {ConnectionError} from "../components/ConnectionError.tsx";
 import {ProcessInstancesListing} from "../components/ProcessInstancesListing.tsx";
+import {Spinner} from "@nextui-org/react";
 
 const Loader: FC = () => {
     return (
-        <Flex justifyContent="center" alignItems="center" p={10}>
-            <Spinner size="xl"/>
-        </Flex>
+        <div className="flex flex-row justify-center align-center p-20">
+            <Spinner size="lg"/>
+        </div>
     )
 };
 

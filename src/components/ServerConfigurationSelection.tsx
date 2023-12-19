@@ -1,22 +1,16 @@
 import {FC, useState} from "react";
 import {useServerConfigurations} from "../shared/useServerConfiguration.tsx";
-import {
-    Button,
-    ButtonGroup,
-    Flex,
-    IconButton,
-    useDisclosure
-} from "@chakra-ui/react";
-import {SmallCloseIcon} from "@chakra-ui/icons";
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import ServerConfigurationModal from "./ServerConfigurationModal.tsx";
+import {Button, useDisclosure} from "@nextui-org/react";
+import {CgPlug, CgTrash} from "react-icons/cg";
 
 export type ServerConfigurationSelectionProps = {
     onSelect: (id: string) => void;
 };
 
 export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps> = ({onSelect}) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {isOpen, onOpen, onClose, onOpenChange} = useDisclosure()
     const [deleteEnabled, setDeleteEnabled] = useState(false);
     const [configurations, setConfigurations] = useServerConfigurations();
 
@@ -35,23 +29,32 @@ export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps>
 
     return (
         <>
-            <Flex alignSelf={"stretch"} alignItems="center" justifyContent="center" gap={10}>
+            <div className="flex flex-row gap-4 mb-10">
                 {configurations.map((configuration) =>
-                    <ButtonGroup size="lg" isAttached colorScheme={deleteEnabled ? "gray" : "blue"} key={configuration.id}>
-                        <Button onClick={() => onSelect(configuration.id)}>{configuration.name}</Button>
-                        {deleteEnabled && <IconButton colorScheme="red" aria-label='Forget this connection' icon={<SmallCloseIcon/>} onClick={() => deleteConfiguration(configuration)}/>}
-                    </ButtonGroup>
+                    deleteEnabled
+                        ? (
+                            <Button size="lg" color="danger" key={configuration.id} onClick={() => deleteConfiguration(configuration)}>
+                                {configuration.name}
+                                <CgTrash/>
+                            </Button>
+                        )
+                        : (
+                            <Button size="lg" color="primary" key={configuration.id} onClick={() => onSelect(configuration.id)}>
+                                {configuration.name}
+                                <CgPlug/>
+                            </Button>
+                        )
                 )}
-            </Flex>
+            </div>
 
-            <Flex my={10}>
-                <Button onClick={onOpen} variant="outline">Configure a new server connection</Button>
-                <Button ml={5} onClick={toggleDeleteEnabled} variant="outline">
+            <div className="flex flex-row gap-4">
+                <Button onClick={onOpen}>Configure a new server connection</Button>
+                <Button onClick={toggleDeleteEnabled}>
                     {deleteEnabled ? "Finish editing" : "Edit connections"}
                 </Button>
-            </Flex>
+            </div>
 
-            <ServerConfigurationModal isOpen={isOpen} onClose={onClose} onSubmit={addConfiguration}/>
+            <ServerConfigurationModal isOpen={isOpen} onOpenChange={onOpenChange} onSubmit={addConfiguration}/>
         </>
     );
 };
