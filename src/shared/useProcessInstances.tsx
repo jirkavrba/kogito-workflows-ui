@@ -1,43 +1,68 @@
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {gql, GraphQLClient} from "graphql-request";
 import {useQuery} from "@tanstack/react-query";
-
+import {ProcessInstance, ProcessInstanceArgument, ProcessInstanceState} from "../types/ProcessInstance.ts";
 
 export type AggregatedProcessInstancesResponse = {
-    instances: Array<AggregatedProcessInstance>
-}
-
-export type ProcessInstanceError = {
-    message: string;
-}
-
-export type AggregatedProcessInstance = {
-    id: string;
-    processName: string;
-    businessKey: string | null;
-    state: string;
-    start: string;
-    lastUpdate: string;
-    error: ProcessInstanceError | null;
+    instances: Array<ProcessInstance>
 }
 
 export type AggregatedProcessInstancesRequest = {
     offset: number;
-    states: Array<string>;
+    states: Array<ProcessInstanceState>;
+    filter: ProcessInstanceArgument;
 }
 
-const defaultRequest: AggregatedProcessInstancesRequest = {
+export const defaultProcessInstancesRequest: AggregatedProcessInstancesRequest = {
     offset: 0,
-    states: [
-        "ABORTED",
-        "ACTIVE",
-        "COMPLETED",
-        "ERROR",
-        "SUSPENDED",
-    ]
+    states: ["ABORTED", "ACTIVE", "COMPLETED", "ERROR", "SUSPENDED"],
+    filter: {}
 };
 
-export const useProcessInstances = (configuration: ServerConfiguration, request: AggregatedProcessInstancesRequest = defaultRequest) => {
+const buildStringArgumentFilter = (
+    name: string | Array<string> | null,
+    property: "processName" | "businessKey"
+): ProcessInstanceArgument => {
+    if (name === null) {
+        return {
+            or: [
+                {[property]: {isNull: true}},
+                {[property]: {like: "*"}},
+            ]
+        }
+    }
+
+    if (Array.isArray(name)) {
+        return {
+            [property]: {
+                in: name
+            }
+        }
+    }
+
+    return {
+        [property]: {
+            like: `*${name}*`
+        }
+    }
+};
+
+export const buildProcessInstancesFilter = (
+    name: string | Array<string> | null,
+    businessKey: string | Array<string> | null,
+): ProcessInstanceArgument => {
+    return {
+        and: [
+            buildStringArgumentFilter(name, "processName"),
+            buildStringArgumentFilter(businessKey, "businessKey")
+        ]
+    }
+}
+
+export const useProcessInstances = (
+    configuration: ServerConfiguration,
+    request: AggregatedProcessInstancesRequest = defaultProcessInstancesRequest
+) => {
     const client = new GraphQLClient(configuration.url)
     return useQuery({
         queryKey: [`instances#${configuration.id}`, request],
@@ -46,20 +71,19 @@ export const useProcessInstances = (configuration: ServerConfiguration, request:
                 AggregatedProcessInstancesResponse,
                 AggregatedProcessInstancesRequest
             >(gql`
-                query getProcessInstances($offset: Int, $states: [ProcessInstanceState]) {
+                query getProcessInstances(
+                  $offset: Int,
+                  $filter: ProcessInstanceArgument
+                ) {
                   instances: ProcessInstances(
-                      where: {
-                        state: {
-                          in: $states
-                        }
-                      },
-                      orderBy: {
-                        lastUpdate: DESC 
-                      },
-                      pagination: {
-                        limit: 100,
-                        offset: $offset
-                      }
+                    where: $filter, 
+                    orderBy: {
+                      lastUpdate: DESC
+                    }, 
+                    pagination: {
+                      limit: 100, 
+                      offset: $offset
+                    }
                   ) {
                     id
                     processName
@@ -68,7 +92,7 @@ export const useProcessInstances = (configuration: ServerConfiguration, request:
                     start
                     lastUpdate
                     error {
-                        message
+                      message
                     }
                   }
                 }
