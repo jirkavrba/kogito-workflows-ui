@@ -7,19 +7,47 @@ export type ProcessInstanceState =
     | "ABORTED"
     | "SUSPENDED";
 
-export type ProcessInstanceError = {
+export type AggregatedProcessInstanceError = {
     message: string;
 };
 
-export type ProcessInstance = {
+export type AggregatedProcessInstance = {
     id: string;
     processName: string;
     businessKey: string | null;
     state: ProcessInstanceState;
     start: string;
     lastUpdate: string;
-    error: ProcessInstanceError | null;
+    error: AggregatedProcessInstanceError | null;
 };
+
+export type ProcessInstanceError = {
+    message: string;
+    nodeDefinitionId: string;
+};
+
+export type ProcessInstanceTimelineItem = {
+    id: string;
+    name: string;
+    nodeId: string;
+    definitionId: string;
+    type: string;
+    enter: string;
+    exit: string | null;
+};
+
+export type ProcessInstance = {
+    id: string;
+    processId: string;
+    processName: string;
+    businessKey: string | null;
+    error: ProcessInstanceError | null;
+    timeline: ProcessInstanceTimelineItem;
+    source: string;
+    state: ProcessInstanceState;
+    start: string;
+    lastUpdate: string;
+}
 
 export type ProcessInstanceArgument = {
     or?: Array<ProcessInstanceArgument>;

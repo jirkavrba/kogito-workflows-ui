@@ -1,10 +1,10 @@
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {gql, GraphQLClient} from "graphql-request";
 import {useQuery} from "@tanstack/react-query";
-import {ProcessInstance, ProcessInstanceArgument, ProcessInstanceState} from "../types/ProcessInstance.ts";
+import {AggregatedProcessInstance, ProcessInstanceArgument, ProcessInstanceState} from "../types/ProcessInstance.ts";
 
 export type AggregatedProcessInstancesResponse = {
-    instances: Array<ProcessInstance>
+    instances: Array<AggregatedProcessInstance>
 }
 
 export type AggregatedProcessInstancesRequest = {

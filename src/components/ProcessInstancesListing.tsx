@@ -4,25 +4,11 @@ import {FC} from "react";
 import {NavLink} from "react-router-dom";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
 import {Card, CardBody, Chip} from "@nextui-org/react";
-import {ProcessInstance} from "../types/ProcessInstance.ts";
+import {AggregatedProcessInstance, ProcessInstance} from "../types/ProcessInstance.ts";
+import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 
-const stateTextColors = {
-    "ACTIVE": "text-success",
-    "COMPLETED": "text-default-400",
-    "ERROR": "text-danger",
-    "SUSPENDED": "text-warn",
-    "ABORTED": "text-warn"
-};
 
-const stateBorderColors = {
-    "ACTIVE": "border-success",
-    "COMPLETED": "border-default-400",
-    "ERROR": "border-danger",
-    "SUSPENDED": "border-warn",
-    "ABORTED": "border-warn"
-};
-
-const ProcessInstanceItem: FC<ProcessInstance> =
+const ProcessInstanceItem: FC<AggregatedProcessInstance> =
     ({
          id,
          processName,
