@@ -18,7 +18,7 @@ export const ProcessInstancePage: FC = () => {
     const navigate = useNavigate();
     const {connection, processInstanceId} = useParams();
     const configuration = useServerConfiguration(connection ?? "");
-    const {data: response, isLoading, error} = useProcessInstance(configuration, processInstanceId ?? "");
+    const {data: response, isLoading, error, refetch} = useProcessInstance(configuration, processInstanceId ?? "");
     const [instance] = response?.instances ?? [];
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export const ProcessInstancePage: FC = () => {
                     {
                         isLoading
                             ? <Loader/>
-                            : <ProcessInstanceDetail instance={instance}/>
+                            : <ProcessInstanceDetail instance={instance} reload={refetch}/>
                     }
         </>
     );
