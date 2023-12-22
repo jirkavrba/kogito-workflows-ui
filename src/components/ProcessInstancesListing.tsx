@@ -1,10 +1,10 @@
 import dateformat from "dateformat";
 import TimeAgo from "react-timeago";
-import {FC} from "react";
+import {FC, useMemo} from "react";
 import {NavLink} from "react-router-dom";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
 import {Card, CardBody, Chip} from "@nextui-org/react";
-import {AggregatedProcessInstance, ProcessInstance} from "../types/ProcessInstance.ts";
+import {AggregatedProcessInstance} from "../types/ProcessInstance.ts";
 import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 
 
@@ -16,8 +16,10 @@ const ProcessInstanceItem: FC<AggregatedProcessInstance> =
          state,
          start,
          lastUpdate,
-         error
+         error,
+         nodes
      }) => {
+        const errorNode = useMemo(() => error && nodes.find(it => it.definitionId === error.nodeDefinitionId), [error, nodes]);
         return (
             <Card className={`${stateBorderColors[state]} border-l-4 rounded-lg transition transform hover:-translate-x-4`}>
                 <CardBody>
@@ -58,7 +60,9 @@ const ProcessInstanceItem: FC<AggregatedProcessInstance> =
                     {error && (
                         <div className="bg-default-100 mt-4 my-2 p-4 rounded-xl text-xs text-danger font-mono">
                             <div className="text-white font-sans mb-1">Error:</div>
-                            {error.message}
+                            <div>{error.message}</div>
+
+                            {errorNode && (<Chip color="danger" variant="dot" size="sm" className="mt-4">{errorNode.name}</Chip>)}
                         </div>
                     )}
                 </CardBody>
@@ -67,7 +71,7 @@ const ProcessInstanceItem: FC<AggregatedProcessInstance> =
     };
 
 export type ProcessInstancesListingProps = {
-    instances: Array<ProcessInstance>;
+    instances: Array<AggregatedProcessInstance>;
 }
 
 export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({instances}) => {

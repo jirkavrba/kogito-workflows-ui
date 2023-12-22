@@ -91,8 +91,13 @@ export const useProcessInstances = (
                     state
                     start
                     lastUpdate
+                     nodes {
+                      name 
+                      definitionId
+                    }
                     error {
                       message
+                      nodeDefinitionId
                     }
                   }
                 }

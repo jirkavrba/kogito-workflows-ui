@@ -1,11 +1,14 @@
 import {ProcessInstance} from "../types/ProcessInstance.ts";
-import {FC} from "react";
+import {FC, useMemo} from "react";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
 import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
 import {Button, Chip} from "@nextui-org/react";
+import {MermaidGraph} from "./MermaidGraph.tsx";
+import {buildMermaidSourceFromJson} from "../helpers/graph.ts";
+import {info} from "autoprefixer";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -14,6 +17,7 @@ export type ProcessInstanceDetailProps = {
 
 export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, reload}) => {
     const {pathname} = useLocation()
+    const graph = useMemo(() => buildMermaidSourceFromJson(instance.source), [instance.source]);
 
     return (
         <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>
@@ -57,6 +61,9 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
             </header>
             <main>
                 TIMELINE
+
+                <MermaidGraph source={graph}/>
+
                 GRAPH
                 VARIABLES
             </main>
