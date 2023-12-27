@@ -9,6 +9,7 @@ import {Button, Chip} from "@nextui-org/react";
 import {MermaidGraph} from "./MermaidGraph.tsx";
 import {buildMermaidSourceFromJson} from "../helpers/graph.ts";
 import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
+import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -69,7 +70,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
             </header>
             <main className="grid grid-row grid-cols-4 flex-grow">
                 <div>
-                    TIMELINE
+                    <ProcessInstanceTimeline timeline={instance.timeline} error={instance.error}/>
                 </div>
 
                 <div>

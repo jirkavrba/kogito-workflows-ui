@@ -45,7 +45,7 @@ export type ProcessInstance = {
     processName: string;
     businessKey: string | null;
     error: ProcessInstanceError | null;
-    timeline: ProcessInstanceTimelineItem;
+    timeline: Array<ProcessInstanceTimelineItem>;
     source: string;
     state: ProcessInstanceState;
     start: string;
