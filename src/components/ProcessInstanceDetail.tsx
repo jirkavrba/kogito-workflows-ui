@@ -8,7 +8,6 @@ import dateformat from "dateformat";
 import {Button, Chip} from "@nextui-org/react";
 import {MermaidGraph} from "./MermaidGraph.tsx";
 import {buildMermaidSourceFromJson} from "../helpers/graph.ts";
-import {info} from "autoprefixer";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
