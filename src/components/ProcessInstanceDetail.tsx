@@ -68,12 +68,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     <Button color="primary" className="mt-5" onPress={reload}>Reload data</Button>
                 </div>
             </header>
-            <main className="grid grid-row grid-cols-4 flex-grow">
+            <main className="grid grid-row grid-cols-5 flex-grow">
                 <div>
                     <ProcessInstanceTimeline timeline={instance.timeline} error={instance.error}/>
                 </div>
 
-                <div>
+                <div className="col-span-2">
                     VARIABLES
                 </div>
 
