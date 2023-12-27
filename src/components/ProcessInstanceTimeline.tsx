@@ -1,7 +1,7 @@
 import {FC, useMemo} from "react";
 import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../types/ProcessInstance.ts";
 import {useLocalStorage} from "usehooks-ts";
-import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuCombine, LuFlag, LuFunctionSquare, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
+import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuBadgeCheck, LuCombine, LuFlag, LuFunctionSquare, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
 import TimeAgo from "react-timeago";
 import {Button, ButtonGroup, Divider, ScrollShadow} from "@nextui-org/react";
 
@@ -31,33 +31,25 @@ type TimelineItemProps = {
 };
 
 const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
-    const errored = error !== null && item.definitionId == error.nodeDefinitionId;
     const duration = item.exit !== null ? (new Date(item.exit).getTime() - new Date(item.enter).getTime()) : null;
-
-    const color = errored ? "text-danger" : (
-        item.exit !== null ? "text-success" : "text-primary"
-    );
+    const completed = duration !== null;
+    const errored = error !== null && item.definitionId == error.nodeDefinitionId;
 
     return (
         <>
             <div className="flex flex-row items-center justify-start p-4 gap-4">
                 <div className="min-w-4">
-                    {errored
-                        ? (
-                            <div className="text-danger">
-                                <LuBadgeAlert/>
-                            </div>
-                        )
-                        : <TimelineItemIcon type={item.type}/>
-                    }
+                    <TimelineItemIcon type={item.type}/>
                 </div>
                 <div className="flex flex-col justify-start items-start">
-                    <div className={`text-sm font-medium ${color}`}>
+                    <div className={`flex flex-row justify-start items-center gap-1 text-sm font-medium`}>
                         {item.name}
+                        {completed && <div className="text-success"><LuBadgeCheck/></div>}
+                        {errored && <div className="text-danger"><LuBadgeAlert/></div>}
                     </div>
-                    <div className="flex flex-row items-center justify-center gap-2">
+                    <div className="flex flex-row items-center justify-center gap-2 text-xs mt-2">
                         <TimeAgo date={item.enter}/>
-                        <div className="flex flex-row items-center justify-start gap-1 opacity-50 font-mono text-sm">
+                        <div className="flex flex-row items-center justify-start gap-1 opacity-50 font-mono">
                             {duration !== null && <><LuTimer/>{duration < 1 ? "< 1" : duration} ms</>}
                         </div>
                     </div>
