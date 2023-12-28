@@ -4,6 +4,7 @@ import {Button, ButtonGroup, Modal, ModalBody, ModalContent, Spinner, useDisclos
 import {LuDiff, LuSave, LuTrash} from "react-icons/lu";
 import {useWorkflowVariablesMutation} from "../shared/useWorkflowVariablesMutation.tsx";
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 export type ProcessInstanceVariablesEditorProps = {
     id: string;
@@ -35,11 +36,19 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
 
     const {isOpen: updatedValueDiffOpen, onOpen: openUpdatedValueDiff, onClose: closeUpdatedValueDiff} = useDisclosure();
     const {mutate, isPending} = useWorkflowVariablesMutation(configuration, id);
+
+    const client = useQueryClient();
     const updateWorkflowVariables = () => {
         const minified = JSON.stringify(JSON.parse(updatedValue));
         mutate(minified, {
             onSuccess: () => {
                 setOriginalValue(updatedValue);
+                setUpdatedValue(updatedValue);
+                setTimeout(async () => {
+                    await client.invalidateQueries({
+                        queryKey: [`instances#${configuration.id}#${id}`]
+                    })
+                }, 100);
             }
         })
     };
