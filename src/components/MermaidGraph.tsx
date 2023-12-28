@@ -23,7 +23,5 @@ export const MermaidGraph: FC<MermaidGraphProps> = ({source}) => {
         });
     }, [source]);
 
-    console.log(source);
-
     return <div key="mermaid" ref={renderedElementRef}/>
 };

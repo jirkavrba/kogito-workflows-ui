@@ -30,7 +30,7 @@ export const ServerPage: FC = () => {
     ), [names, businessKey]);
 
     const {data: definitionsResponse, isLoading: definitionsLoading} = useProcessDefinitions(configuration);
-    const {data: instancesResponse, isLoading: instancesLoading, error} = useProcessInstances(configuration, {
+    const {data: instancesResponse, isLoading: instancesLoading, error, refetch} = useProcessInstances(configuration, {
         ...defaultProcessInstancesRequest, filter
     });
 
@@ -45,6 +45,7 @@ export const ServerPage: FC = () => {
                             ? <Loader/>
                             : <ProcessInstancesFilter
                                 definitions={definitionsResponse?.definitions ?? []}
+                                refresh={refetch}
                                 onChange={({processNames, businessKey}) => {
                                     setNames(processNames);
                                     setBusinessKey(businessKey);

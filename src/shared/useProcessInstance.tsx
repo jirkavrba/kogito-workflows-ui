@@ -18,6 +18,8 @@ export const useProcessInstance = (
     const client = new GraphQLClient(configuration.url)
     return useQuery({
         queryKey: [`instances#${configuration.id}#${instanceId}`],
+        refetchInterval: 5000,
+        refetchIntervalInBackground: true,
         queryFn: async () => {
             return await client.request<
                 ProcessInstanceResponse,
@@ -48,9 +50,9 @@ export const useProcessInstance = (
                       enter
                       exit
                     }
-                    source
                     state
                     start
+                    variables
                     lastUpdate
                   }
                 }

@@ -1,6 +1,7 @@
 import {FC, useEffect, useState} from "react";
 import {ProcessDefinition} from "../shared/useProcessDefinitions.tsx";
-import {Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
+import {Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
+import {LuRefreshCcw} from "react-icons/lu";
 
 type ProcessInstancesFilterState = {
     processNames: Array<string> | null,
@@ -11,9 +12,10 @@ type ProcessInstancesFilterState = {
 export type ProcessInstancesFilterProps = {
     definitions: Array<ProcessDefinition>;
     onChange?: (state: ProcessInstancesFilterState) => void;
+    refresh: () => void;
 };
 
-export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange}) => {
+export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh }) => {
     const [state, setState] = useState<ProcessInstancesFilterState>({
         processNames: null,
         businessKey: null,
@@ -55,6 +57,11 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                             : event.target.value
                     }))
                 }/>
+
+                <Button onClick={refresh} size={"lg"}>
+                    <LuRefreshCcw/>
+                    Refresh
+                </Button>
             </CardBody>
         </Card>
     )

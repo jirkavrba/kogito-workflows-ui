@@ -33,7 +33,7 @@ type TimelineItemProps = {
 const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
     const duration = item.exit !== null ? (new Date(item.exit).getTime() - new Date(item.enter).getTime()) : null;
     const completed = duration !== null;
-    const errored = error !== null && item.definitionId == error.nodeDefinitionId;
+    const errored = error !== null && item.definitionId == error.nodeDefinitionId && !completed;
 
     return (
         <>
@@ -95,11 +95,11 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
     return (
         <div className="flex flex-col gap-4">
             <ButtonGroup>
-                <Button color={newestFirst ? "primary" : "default"} onClick={() => setNewestFirst(true)}>
+                <Button size="sm" color={newestFirst ? "primary" : "default"} onClick={() => setNewestFirst(true)}>
                     <LuArrowDownNarrowWide/>
                     Newest first
                 </Button>
-                <Button color={newestFirst ? "default" : "primary"} onClick={() => setNewestFirst(false)}>
+                <Button size="sm" color={newestFirst ? "default" : "primary"} onClick={() => setNewestFirst(false)}>
                     <LuArrowUpWideNarrow/>
                     Oldest first
                 </Button>

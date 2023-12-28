@@ -66,6 +66,8 @@ export const useProcessInstances = (
     const client = new GraphQLClient(configuration.url)
     return useQuery({
         queryKey: [`instances#${configuration.id}`, request],
+        refetchInterval: 5000,
+        refetchIntervalInBackground: true,
         queryFn: async () => {
             return await client.request<
                 AggregatedProcessInstancesResponse,

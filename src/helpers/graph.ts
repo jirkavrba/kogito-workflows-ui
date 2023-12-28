@@ -56,8 +56,6 @@ const buildForeachState = (state: ForeachState) => {
     const definition  = `class ${state.name} foreachNode`;
     const transition = `${state.name} --> ${resolveTransition(state.transition)}`
 
-    console.log(state);
-
     return [definition, transition].join("\n");
 }
 
@@ -77,8 +75,6 @@ const buildSwitchState = (state: SwitchStateDefinition) => {
 }
 
 export const buildMermaidSourceFromJson = (source: string): string => {
-    console.log(JSON.parse(source));
-
     const workflow = JSON.parse(source) as ServerlessWorkflowDefinition;
     const nodes = workflow.states.map(state => {
         switch (state.type) {
