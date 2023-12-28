@@ -1,39 +1,58 @@
 import {FC, useEffect, useMemo, useState} from "react";
 import {DiffEditor, Editor, useMonaco} from "@monaco-editor/react";
 import {Button, ButtonGroup, Modal, ModalBody, ModalContent, Spinner, useDisclosure} from "@nextui-org/react";
-import {LuDiff, LuSave} from "react-icons/lu";
-// import {useLocalStorage} from "usehooks-ts";
+import {LuDiff, LuSave, LuTrash} from "react-icons/lu";
+import {useWorkflowVariablesMutation} from "../shared/useWorkflowVariablesMutation.tsx";
+import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 
 export type ProcessInstanceVariablesEditorProps = {
+    id: string;
     variables: object;
+    configuration: ServerConfiguration;
 };
 
-export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorProps> = ({variables}) => {
+const validate = (json: string) => {
+    try {
+        JSON.parse(json);
+        return true
+    } catch {
+        return false;
+    }
+}
+
+const jsonEquals = (first: string, second: string) => {
+    return JSON.stringify(JSON.parse(first)) === JSON.stringify(JSON.parse(second));
+}
+
+export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorProps> = ({variables, configuration, id}) => {
     const monaco = useMonaco();
 
-    const formatted = useMemo(() => JSON.stringify(variables, null, 2), [variables]);
-    const originalValue = JSON.stringify(variables);
+    const [originalValue, setOriginalValue] = useState(JSON.stringify(variables, null, 2));
     const [updatedValue, setUpdatedValue] = useState(originalValue)
+
+    const updatedValueValid = useMemo(() => validate(updatedValue), [updatedValue]);
+    const pendingChanges = useMemo(() => updatedValueValid && !jsonEquals(originalValue, updatedValue), [updatedValueValid, originalValue, updatedValue]);
+
     const {isOpen: updatedValueDiffOpen, onOpen: openUpdatedValueDiff, onClose: closeUpdatedValueDiff} = useDisclosure();
-
-    const updatedValueValid = useMemo(() => {
-            try {
-                JSON.parse(updatedValue);
-                return true
-            } catch {
-                return false;
+    const {mutate, isPending} = useWorkflowVariablesMutation(configuration, id);
+    const updateWorkflowVariables = () => {
+        const minified = JSON.stringify(JSON.parse(updatedValue));
+        mutate(minified, {
+            onSuccess: () => {
+                setOriginalValue(updatedValue);
             }
-        },
-        [updatedValue]
-    );
+        })
+    };
 
-    const pendingChanges = useMemo(() =>
-            updatedValueValid && JSON.stringify(JSON.parse(originalValue)) != JSON.stringify(JSON.parse(updatedValue)),
-        [originalValue, updatedValue]
-    );
+    useEffect(() => {
+        const formatted = JSON.stringify(variables, null, 2);
 
-    // const [snapshots, setSnapshots] = useLocalStorage("workflow-data-snapshots", []);
-    // const [watches, setWatches] = useLocalStorage("workflow-data-watches", []);
+        setOriginalValue(formatted);
+
+        if (!pendingChanges) {
+            setUpdatedValue(formatted)
+        }
+    }, [variables, pendingChanges]);
 
     useEffect(() => {
         monaco?.editor?.defineTheme("kogito", {
@@ -46,10 +65,12 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
         })
     }, [monaco]);
 
+    // TODO: Split this into separate components
+
     return (
         <>
             {!updatedValueValid && (
-                <div className="flex flex-col items-start justify-start bg-danger p-2 rounded-t-lg">
+                <div className="flex flex-col items-start justify-start bg-danger p-4 rounded-lg mb-2">
                     <h3 className="text-sm font-medium">Invalid JSON</h3>
                     <p className="text-xs">Updating workflow variables will fail.</p>
                 </div>
@@ -60,11 +81,15 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                         Workflow variables changed
                     </h3>
                     <ButtonGroup>
-                        <Button onClick={openUpdatedValueDiff}>
+                        <Button onClick={() => setUpdatedValue(originalValue)} disabled={isPending}>
+                            <LuTrash/>
+                            Discard changes
+                        </Button>
+                        <Button onClick={openUpdatedValueDiff} disabled={isPending}>
                             <LuDiff/>
                             View diff
                         </Button>
-                        <Button color="primary">
+                        <Button color="primary" onClick={updateWorkflowVariables} isLoading={isPending} disabled={isPending}>
                             <LuSave/>
                             Save
                         </Button>
@@ -73,7 +98,7 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
             )}
             <Editor
                 language="json"
-                value={formatted}
+                value={updatedValue}
                 loading={<Spinner size="lg"/>}
                 theme={"kogito"}
                 onChange={(value) => setUpdatedValue(value ?? "")}
@@ -86,7 +111,7 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                         enabled: false
                     }
                 }}
-                height="100vh"
+                height="70vh"
             />
             {
                 updatedValueDiffOpen && (

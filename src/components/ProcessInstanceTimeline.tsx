@@ -104,7 +104,7 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
                     Oldest first
                 </Button>
             </ButtonGroup>
-            <ScrollShadow className="max-h-screen">
+            <ScrollShadow className="h-[70vh]">
                 {sorted.map((item, key) =>
                     <TimelineItem item={item} key={key} error={error}/>
                 )}

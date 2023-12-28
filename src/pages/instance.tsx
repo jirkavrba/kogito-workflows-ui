@@ -36,7 +36,12 @@ export const ProcessInstancePage: FC = () => {
             {
                 isLoading
                     ? <Loader/>
-                    : <ProcessInstanceDetail instance={instance} source={source ?? null} reload={refetch}/>
+                    : <ProcessInstanceDetail
+                        instance={instance}
+                        source={source ?? null}
+                        configuration={configuration}
+                        reload={refetch}
+                    />
             }
         </>
     );

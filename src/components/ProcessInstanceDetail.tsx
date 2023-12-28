@@ -12,14 +12,16 @@ import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-
 import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuRefreshCcw} from "react-icons/lu";
 import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
+import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
     source: string | null;
+    configuration: ServerConfiguration;
     reload: () => void;
 };
 
-export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, source, reload}) => {
+export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, source, configuration, reload}) => {
     const {pathname} = useLocation()
     const graph = useMemo(() => source !== null ? buildMermaidSourceFromJson(source) : null, [source]);
     const graphTransformRef = useRef<ReactZoomPanPinchRef | null>(null);
@@ -33,7 +35,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
     }, []);
 
     return (
-        <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8 min-h-screen`}>
+        <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>
             <header className="flex flex-row items-center justify-between pb-4 mb-4 border-b-1 border-default">
                 <div>
                     <div className="flex flex-row items-center justify-start gap-4 my-2">
@@ -91,31 +93,29 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         onSelectionChange={(key) => setSelectedTab(key as string)}
                     >
                         <Tab key="variables" title="Workflow variables">
-                            <ProcessInstanceVariablesEditor variables={instance.variables}/>
+                            <ProcessInstanceVariablesEditor variables={instance.variables} configuration={configuration} id={instance.id}/>
                         </Tab>
-                        {graph && (
-                            <Tab key="graph" title="Workflow graph">
-                                <div className="flex flex-col">
-                                    <div className="col-span-2 h-full [&>div]:w-full [&>div]:h-full">
-                                        <TransformWrapper ref={graphTransformRef}>
-                                            <TransformComponent>
-                                                <MermaidGraph source={graph}/>
-                                            </TransformComponent>
-                                        </TransformWrapper>
-                                    </div>
+                        <Tab key="graph" title={graph ? "Workflow graph" : "Workflow graph - unavailable"} disabled={!graph}>
+                            <div className="flex flex-col">
+                                <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
+                                    <TransformWrapper ref={graphTransformRef}>
+                                        <TransformComponent>
+                                            <MermaidGraph source={graph!}/>
+                                        </TransformComponent>
+                                    </TransformWrapper>
                                 </div>
-                            </Tab>
-                        )}
+                            </div>
+                        </Tab>
                     </Tabs>
                 </div>
 
                 <div className="hidden grid-cols-2 col-span-4 2k:grid">
                     <div className={graph ? "col-span-1" : "col-span-2"}>
-                        <ProcessInstanceVariablesEditor variables={instance.variables}/>
+                        <ProcessInstanceVariablesEditor variables={instance.variables} configuration={configuration} id={instance.id}/>
                     </div>
                     {graph && (
                         <div className="flex flex-col">
-                            <div className="col-span-2 h-full [&>div]:w-full [&>div]:h-full">
+                            <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
                                 <TransformWrapper ref={graphTransformRef}>
                                     <TransformComponent>
                                         <MermaidGraph source={graph}/>
