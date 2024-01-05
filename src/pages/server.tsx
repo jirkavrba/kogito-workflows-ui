@@ -8,6 +8,7 @@ import {ProcessInstancesListing} from "../components/ProcessInstancesListing.tsx
 import {Spinner} from "@nextui-org/react";
 import {useProcessDefinitions} from "../shared/useProcessDefinitions.tsx";
 import {ProcessInstancesFilter} from "../components/ProcessInstancesFilter.tsx";
+import {ProcessInstanceState} from "../types/ProcessInstance.ts";
 
 const Loader: FC = () => {
     return (
@@ -23,22 +24,24 @@ export const ServerPage: FC = () => {
 
     const [names, setNames] = useState<Array<string> | null>(null);
     const [businessKey, setBusinessKey] = useState<string | null>(null);
+    const [processStates, setProcessStates] = useState<Array<ProcessInstanceState> | null>(null);
 
     const filter = useMemo(() => buildProcessInstancesFilter(
         names,
+        processStates,
         businessKey,
-    ), [names, businessKey]);
+    ), [names, businessKey, processStates]);
 
     const {data: definitionsResponse, isLoading: definitionsLoading} = useProcessDefinitions(configuration);
     const {data: instancesResponse, isLoading: instancesLoading, error, refetch} = useProcessInstances(configuration, {
-        ...defaultProcessInstancesRequest, filter
+        ...defaultProcessInstancesRequest,
+        filter,
     });
 
     return (
         <>
             <ServerNavbar configuration={configuration}/>
             <main className="grid grid-cols-3 gap-8 mx-8">
-            {/*<main className="flex flex-row items-start justify-start gap-8 px-8">*/}
                 <div className="col-span-1">
                     {
                         definitionsLoading
@@ -46,9 +49,10 @@ export const ServerPage: FC = () => {
                             : <ProcessInstancesFilter
                                 definitions={definitionsResponse?.definitions ?? []}
                                 refresh={refetch}
-                                onChange={({processNames, businessKey}) => {
+                                onChange={({processNames, processStates, businessKey}) => {
                                     setNames(processNames);
                                     setBusinessKey(businessKey);
+                                    setProcessStates(processStates);
                                 }}/>
                     }
                 </div>

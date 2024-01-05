@@ -7,6 +7,14 @@ export type ProcessInstanceState =
     | "ABORTED"
     | "SUSPENDED";
 
+export const availableProcessInstanceStates: Array<ProcessInstanceState> = [
+    "ABORTED",
+    "ACTIVE",
+    "COMPLETED",
+    "ERROR",
+    "SUSPENDED",
+];
+
 export type ProcessInstanceError = {
     message: string;
     nodeDefinitionId: string;
