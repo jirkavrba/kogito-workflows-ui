@@ -4,24 +4,21 @@ import {Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/rea
 import {LuRefreshCcw} from "react-icons/lu";
 import {availableProcessInstanceStates, ProcessInstanceState} from "../types/ProcessInstance.ts";
 
-type ProcessInstancesFilterState = {
+export type ProcessInstancesFilterState = {
     processNames: Array<string> | null,
     processStates: Array<ProcessInstanceState> | null,
     businessKey: string | null
 }
 
 export type ProcessInstancesFilterProps = {
+    initialState: ProcessInstancesFilterState;
     definitions: Array<ProcessDefinition>;
     onChange?: (state: ProcessInstancesFilterState) => void;
     refresh: () => void;
 };
 
-export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh }) => {
-    const [state, setState] = useState<ProcessInstancesFilterState>({
-        processNames: null,
-        processStates: availableProcessInstanceStates,
-        businessKey: null,
-    });
+export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh, initialState }) => {
+    const [state, setState] = useState<ProcessInstancesFilterState>(initialState);
 
     useEffect(() => void onChange?.(state), [onChange, state]);
 
@@ -33,6 +30,7 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                     selectionMode="multiple"
                     label="Process definition"
                     placeholder="All process definitions"
+                    defaultSelectedKeys={state.processNames?.filter(it => it !== null)}
                     onChange={(event) =>
                         void setState(current => ({
                             ...current,
@@ -52,6 +50,7 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                     selectionMode="multiple"
                     label="Process instance states"
                     placeholder="All process instance states"
+                    defaultSelectedKeys={state.processStates?.filter(it => it !== null)}
                     onChange={(event) =>
                         void setState(current => ({
                             ...current,
@@ -70,6 +69,7 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                 <Input
                     label="Business key"
                     placeholder="Fuzzy search is enabled by default"
+                    defaultValue={state.businessKey ?? ""}
                     onChange={(event) =>
                     void setState(current => ({
                         ...current,

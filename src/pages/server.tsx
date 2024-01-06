@@ -24,15 +24,15 @@ export const ServerPage: FC = () => {
     const {connection} = useParams();
     const configuration = useServerConfiguration(connection ?? "");
 
-    const [names, setNames] = useState<Array<string> | null>(null);
     const [businessKey, setBusinessKey] = useState<string | null>(null);
     const [processStates, setProcessStates] = useState<Array<ProcessInstanceState> | null>(null);
+    const [processNames, setProcessNames] = useState<Array<string> | null>(null);
 
     const filter = useMemo(() => buildProcessInstancesFilter(
-        names,
+        processNames,
         processStates,
         businessKey,
-    ), [names, businessKey, processStates]);
+    ), [processNames, businessKey, processStates]);
 
     const {data: definitionsResponse, isLoading: definitionsLoading} = useProcessDefinitions(configuration);
     const {data: instancesResponse, isLoading: instancesLoading, error, refetch} = useProcessInstances(configuration, {
@@ -49,10 +49,15 @@ export const ServerPage: FC = () => {
                         definitionsLoading
                             ? <Loader/>
                             : <ProcessInstancesFilter
+                                initialState={{
+                                    businessKey,
+                                    processStates,
+                                    processNames,
+                                }}
                                 definitions={definitionsResponse?.definitions ?? []}
                                 refresh={refetch}
                                 onChange={({processNames, processStates, businessKey}) => {
-                                    setNames(processNames);
+                                    setProcessNames(processNames);
                                     setBusinessKey(businessKey);
                                     setProcessStates(processStates);
                                 }}/>
