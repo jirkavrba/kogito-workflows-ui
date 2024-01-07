@@ -14,9 +14,13 @@ RUN npm run build
 
 FROM nginx:alpine
 
+WORKDIR /workspace
+RUN apk add --no-cache bash
+
 COPY --from=build /app/dist /var/www/html
-COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/entrypoint.sh /workspace/entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
+ENTRYPOINT [ "bash", "/workspace/entrypoint.sh" ]
