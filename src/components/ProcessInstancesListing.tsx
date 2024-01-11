@@ -3,7 +3,7 @@ import TimeAgo from "react-timeago";
 import {FC, useMemo} from "react";
 import {NavLink} from "react-router-dom";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
-import {Card, CardBody, Chip} from "@nextui-org/react";
+import {Button, Card, CardBody, Chip} from "@nextui-org/react";
 import {AggregatedProcessInstance} from "../types/ProcessInstance.ts";
 import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 
@@ -72,11 +72,21 @@ const ProcessInstanceItem: FC<AggregatedProcessInstance> =
 
 export type ProcessInstancesListingProps = {
     instances: Array<AggregatedProcessInstance>;
+    page: number,
+    loadNextPage: () => void;
+    loadPreviousPage: () => void;
 }
 
-export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({instances}) => {
+export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({instances, page, loadNextPage, loadPreviousPage}) => {
     return (
         <div className="flex flex-col items-stretch justify-start gap-4">
+            {page > 0 && (
+                <div className="flex flex-row items-center justify-center">
+                    <Button onPress={loadPreviousPage}>
+                        Load newer process instances
+                    </Button>
+                </div>
+            )}
             {
                 instances.map(instance =>
                     <NavLink to={`instance/${instance.id}`} key={instance.id}>
@@ -84,6 +94,11 @@ export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({insta
                     </NavLink>
                 )
             }
+            <div className="flex flex-row items-center justify-center">
+                <Button onPress={loadNextPage}>
+                    Load older process instances
+                </Button>
+            </div>
         </div>
     )
 };

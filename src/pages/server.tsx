@@ -2,7 +2,7 @@ import {FC, useMemo, useState} from "react";
 import {useParams} from "react-router-dom";
 import {useServerConfiguration} from "../shared/useServerConfiguration.tsx";
 import {ServerNavbar} from "../components/ServerNavbar.tsx";
-import {buildProcessInstancesFilter, defaultProcessInstancesRequest, useProcessInstances} from "../shared/useProcessInstances.tsx";
+import {buildProcessInstancesFilter, defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
 import {ConnectionError} from "../components/ConnectionError.tsx";
 import {ProcessInstancesListing} from "../components/ProcessInstancesListing.tsx";
 import {Spinner} from "@nextui-org/react";
@@ -27,6 +27,11 @@ export const ServerPage: FC = () => {
     const [businessKey, setBusinessKey] = useState<string | null>(null);
     const [processStates, setProcessStates] = useState<Array<ProcessInstanceState> | null>(null);
     const [processNames, setProcessNames] = useState<Array<string> | null>(null);
+    const [page, setPage] = useState(0);
+    const offset = page * processInstancesPerPage;
+
+    const loadNextPage = () => setPage(current => current + 1);
+    const loadPreviousPage = () => setPage(current => Math.max(current - 1, 0));
 
     const filter = useMemo(() => buildProcessInstancesFilter(
         processNames,
@@ -38,6 +43,7 @@ export const ServerPage: FC = () => {
     const {data: instancesResponse, isLoading: instancesLoading, error, refetch} = useProcessInstances(configuration, {
         ...defaultProcessInstancesRequest,
         filter,
+        offset,
     });
 
     return (
@@ -86,7 +92,12 @@ export const ServerPage: FC = () => {
                             : (
                                 instancesLoading
                                     ? <Loader/>
-                                    : <ProcessInstancesListing instances={instancesResponse?.instances ?? []}/>
+                                    : <ProcessInstancesListing
+                                        instances={instancesResponse?.instances ?? []}
+                                        page={page}
+                                        loadNextPage={loadNextPage}
+                                        loadPreviousPage={loadPreviousPage}
+                                    />
                             )
                     }
                 </div>

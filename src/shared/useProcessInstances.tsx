@@ -63,6 +63,8 @@ export const buildProcessInstancesFilter = (
     }
 }
 
+export const processInstancesPerPage = 10
+
 export const useProcessInstances = (
     configuration: ServerConfiguration,
     request: AggregatedProcessInstancesRequest = defaultProcessInstancesRequest
@@ -87,7 +89,7 @@ export const useProcessInstances = (
                       lastUpdate: DESC
                     }, 
                     pagination: {
-                      limit: 100, 
+                      limit: ${processInstancesPerPage}, 
                       offset: $offset
                     }
                   ) {
