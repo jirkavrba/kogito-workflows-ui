@@ -198,8 +198,8 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                             <DiffEditor
                                 className="m-8"
                                 language={"json"}
-                                original={JSON.stringify(JSON.parse(originalValue), null, 2)}
-                                modified={JSON.stringify(JSON.parse(selectedSnapshot!.json), null, 2)}
+                                modified={JSON.stringify(JSON.parse(originalValue), null, 2)}
+                                original={JSON.stringify(JSON.parse(selectedSnapshot!.json), null, 2)}
                                 theme="kogito"
                                 options={{
                                     readOnly: true,
