@@ -10,7 +10,7 @@ import {useProcessDefinitions} from "../shared/useProcessDefinitions.tsx";
 import {ProcessInstancesFilter} from "../components/ProcessInstancesFilter.tsx";
 import {ProcessInstanceState} from "../types/ProcessInstance.ts";
 import {LuGitlab} from "react-icons/lu";
-import { version } from "../version.ts";
+import {version} from "../version.ts";
 
 const Loader: FC = () => {
     return (
@@ -93,6 +93,7 @@ export const ServerPage: FC = () => {
                                 instancesLoading
                                     ? <Loader/>
                                     : <ProcessInstancesListing
+                                        routePrefix={`/server/${configuration.id}`}
                                         instances={instancesResponse?.instances ?? []}
                                         page={page}
                                         loadNextPage={loadNextPage}

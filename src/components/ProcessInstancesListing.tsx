@@ -71,13 +71,14 @@ const ProcessInstanceItem: FC<AggregatedProcessInstance> =
     };
 
 export type ProcessInstancesListingProps = {
+    routePrefix: string;
     instances: Array<AggregatedProcessInstance>;
     page: number,
     loadNextPage: () => void;
     loadPreviousPage: () => void;
 }
 
-export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({instances, page, loadNextPage, loadPreviousPage}) => {
+export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({routePrefix, instances, page, loadNextPage, loadPreviousPage}) => {
     return (
         <div className="flex flex-col items-stretch justify-start gap-4">
             {page > 0 && (
@@ -89,7 +90,7 @@ export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({insta
             )}
             {
                 instances.map(instance =>
-                    <NavLink to={`instance/${instance.id}`} key={instance.id}>
+                    <NavLink to={`${routePrefix}/instance/${instance.id}`} key={instance.id}>
                         <ProcessInstanceItem {...instance}/>
                     </NavLink>
                 )

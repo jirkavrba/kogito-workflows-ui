@@ -1,31 +1,52 @@
-import { ProcessInstance } from "../types/ProcessInstance.ts";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { ProcessInstanceStateIcon } from "./ProcessInstanceStateIcon.tsx";
-import { stateBorderColors, stateTextColors } from "../helpers/colors.ts";
-import { NavLink, useLocation } from "react-router-dom";
+import {ProcessInstance} from "../types/ProcessInstance.ts";
+import {FC, useEffect, useRef, useState} from "react";
+import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
+import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
+import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
-import { Button, Chip, Tab, Tabs } from "@nextui-org/react";
-import { MermaidGraph } from "./MermaidGraph.tsx";
-import { buildMermaidSourceFromJson } from "../helpers/graph.ts";
-import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-import { ProcessInstanceTimeline } from "./ProcessInstanceTimeline.tsx";
-import { LuArrowLeft, LuRefreshCcw } from "react-icons/lu";
-import { ProcessInstanceVariablesEditor } from "./ProcessInstanceVariablesEditor.tsx";
-import { ServerConfiguration } from "../types/ServerConfiguration.ts";
+import {Button, Chip, Spinner, Tab, Tabs} from "@nextui-org/react";
+import {ReactZoomPanPinchRef} from "react-zoom-pan-pinch";
+import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
+import {LuArrowLeft, LuRefreshCcw} from "react-icons/lu";
+import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
+import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {ProcessInstancesListing} from "./ProcessInstancesListing.tsx";
+import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
-    source: string | null;
     configuration: ServerConfiguration;
     reload: () => void;
 };
 
-export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({ instance, source, configuration, reload }) => {
-    const { pathname } = useLocation()
-    const graph = useMemo(() => source !== null ? buildMermaidSourceFromJson(source) : null, [source]);
+export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, configuration, reload}) => {
+    const {pathname} = useLocation()
     const graphTransformRef = useRef<ReactZoomPanPinchRef | null>(null);
     const [selectedTab, setSelectedTab] = useState("variables");
+    const [correlatedWorkflowsPage, setCorrelatedWorkflowsPage] = useState(0);
+    const loadNextPage = () => setCorrelatedWorkflowsPage(current => current + 1);
+    const loadPreviousPage = () => setCorrelatedWorkflowsPage(current => Math.max(current - 1, 0));
+    const {data: correlatedInstancesResponse, isLoading} = useProcessInstances(configuration, {
+        ...defaultProcessInstancesRequest,
+        filter: {
+            and: [
+                {
+                    businessKey: {
+                        equal: instance.businessKey ?? ""
+                    },
+                },
+                {
+                    not: {
+                        id: {
+                            equal: instance.id
+                        }
+                    }
+                }
+            ]
+        },
+        offset: correlatedWorkflowsPage * processInstancesPerPage
+    });
 
     useEffect(() => {
         setTimeout(() => {
@@ -40,13 +61,13 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({ instance
                 <div>
                     <div className="flex flex-row items-center justify-start gap-4 my-2">
                         <NavLink to={pathname.split("/instance/")[0]} className="opacity-50 hover:opacity-100 text-2xl">
-                            <LuArrowLeft />
+                            <LuArrowLeft/>
                         </NavLink>
                         <h1 className="text-3xl font-bold my-2">
                             {instance.processName}
                         </h1>
                         <div className={`${stateTextColors[instance.state]} flex flex-row items-center justify-start gap-2`}>
-                            <ProcessInstanceStateIcon state={instance.state} />
+                            <ProcessInstanceStateIcon state={instance.state}/>
                             {instance.state}
                         </div>
                     </div>
@@ -67,22 +88,22 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({ instance
                 </div>
                 <div className="flex flex-col items-end justify-end text-sm gap-1">
                     <p className="opacity-90">
-                        Updated <TimeAgo date={instance.lastUpdate} />
+                        Updated <TimeAgo date={instance.lastUpdate}/>
                         <span className="opacity-50 ml-4 font-mono text-xs hidden lg:inline-block">{dateformat(instance.lastUpdate, 'HH:MM:ss')}</span>
                     </p>
                     <p className="opacity-70">
-                        Created <TimeAgo date={instance.start} />
+                        Created <TimeAgo date={instance.start}/>
                         <span className="opacity-50 ml-4 font-mono text-xs hidden lg:inline-block">{dateformat(instance.start, 'HH:MM:ss')}</span>
                     </p>
                     <Button color="primary" className="mt-5" onPress={reload}>
-                        <LuRefreshCcw />
+                        <LuRefreshCcw/>
                         Refresh
                     </Button>
                 </div>
             </header>
             <main className="grid grid-row grid-cols-5 flex-grow gap-4">
                 <div>
-                    <ProcessInstanceTimeline timeline={instance.timeline} error={instance.error} />
+                    <ProcessInstanceTimeline timeline={instance.timeline} error={instance.error}/>
                 </div>
 
                 <div className="col-span-4 2k:hidden">
@@ -100,22 +121,24 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({ instance
                                 id={instance.id}
                             />
                         </Tab>
-                        <Tab key="graph" title={graph ? "Workflow graph" : "Workflow graph - unavailable"} disabled={!graph}>
-                            <div className="flex flex-col">
-                                <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
-                                    <TransformWrapper ref={graphTransformRef}>
-                                        <TransformComponent>
-                                            <MermaidGraph source={graph!} />
-                                        </TransformComponent>
-                                    </TransformWrapper>
-                                </div>
-                            </div>
+                        <Tab key="correlations" title="Correlated workflows">
+                            {
+                                isLoading
+                                    ? <Spinner/>
+                                    : <ProcessInstancesListing
+                                        routePrefix={`/server/${configuration.id}`}
+                                        instances={correlatedInstancesResponse?.instances ?? []}
+                                        page={correlatedWorkflowsPage}
+                                        loadNextPage={loadNextPage}
+                                        loadPreviousPage={loadPreviousPage}
+                                    />
+                            }
                         </Tab>
                     </Tabs>
                 </div>
 
                 <div className="hidden grid-cols-2 col-span-4 2k:grid">
-                    <div className={graph ? "col-span-1" : "col-span-2"}>
+                    <div>
                         <ProcessInstanceVariablesEditor
                             variables={instance.variables}
                             configuration={configuration}
@@ -123,19 +146,25 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({ instance
                             id={instance.id}
                         />
                     </div>
-                    {graph && (
-                        <div className="flex flex-col">
-                            <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
-                                <TransformWrapper ref={graphTransformRef}>
-                                    <TransformComponent>
-                                        <MermaidGraph source={graph} />
-                                    </TransformComponent>
-                                </TransformWrapper>
-                            </div>
-                        </div>
-                    )}
-                </div>
 
+                    <div className="flex flex-col">
+                        <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
+                            <h2 className="text-xs text-center font-medium uppercase tracking-wide my-4">Correlated workflows</h2>
+                            {
+                                isLoading
+                                    ? <Spinner/>
+                                    : <ProcessInstancesListing
+                                        routePrefix={`/server/${configuration.id}`}
+                                        instances={correlatedInstancesResponse?.instances ?? []}
+                                        page={correlatedWorkflowsPage}
+                                        loadNextPage={loadNextPage}
+                                        loadPreviousPage={loadPreviousPage}
+                                    />
+                            }
+                        </div>
+                    </div>
+
+                </div>
             </main>
         </div>
     )

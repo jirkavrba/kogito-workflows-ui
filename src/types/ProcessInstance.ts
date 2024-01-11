@@ -64,6 +64,7 @@ export type ProcessInstanceArgument = {
     or?: Array<ProcessInstanceArgument>;
     and?: Array<ProcessInstanceArgument>;
     not?: ProcessInstanceArgument;
+    id?: StringArgument;
     processName?: StringArgument;
     businessKey?: StringArgument;
     state?: ProcessInstanceStateArgument;
