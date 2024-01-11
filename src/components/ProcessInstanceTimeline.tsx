@@ -1,7 +1,7 @@
 import {FC, useMemo} from "react";
 import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../types/ProcessInstance.ts";
 import {useLocalStorage} from "usehooks-ts";
-import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuBadgeCheck, LuCombine, LuFlag, LuFunctionSquare, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
+import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuBadgeCheck, LuCombine, LuFlag, LuFunctionSquare, LuSplit, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
 import TimeAgo from "react-timeago";
 import {Button, ButtonGroup, Divider, ScrollShadow} from "@nextui-org/react";
 
@@ -22,6 +22,8 @@ const TimelineItemIcon: FC<{ type: string }> = ({type}) => {
             return <LuSquareCode/>
         case "ActionNode":
             return <LuFunctionSquare/>;
+        case "Split":
+            return <LuSplit/>;
     }
 };
 
@@ -74,7 +76,8 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
         "StartNode",
         "WorkItemNode",
         "EventNode",
-        "ActionNode"
+        "ActionNode",
+        "Split"
     ];
 
     const ignoredPrefixes = [
