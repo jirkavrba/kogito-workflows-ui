@@ -89,17 +89,28 @@ export const ProcessInstancesListing: FC<ProcessInstancesListingProps> = ({route
                 </div>
             )}
             {
+                (instances.length === 0 && page === 0) && (
+                    <div className="m-8 p-8 flex flex-row items-center justify-center border-2 rounded-xl border-dashed border-default-300 text-default-300 text-sm">
+                        There are no workflow instances to be displayed
+                    </div>
+                )
+            }
+            {
                 instances.map(instance =>
                     <NavLink to={`${routePrefix}/instance/${instance.id}`} key={instance.id}>
                         <ProcessInstanceItem {...instance}/>
                     </NavLink>
                 )
             }
-            <div className="flex flex-row items-center justify-center">
-                <Button onPress={loadNextPage}>
-                    Load older process instances
-                </Button>
-            </div>
+            {
+                instances.length > 0 && (
+                    <div className="flex flex-row items-center justify-center">
+                        <Button onPress={loadNextPage}>
+                            Load older process instances
+                        </Button>
+                    </div>
+                )
+            }
         </div>
     )
 };

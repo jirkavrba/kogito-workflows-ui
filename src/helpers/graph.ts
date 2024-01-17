@@ -11,7 +11,7 @@ import {
 
 const resolveTransition = (transition: TransitionRef | undefined): string => {
     if (!transition) {
-        return "[*]";
+        return "end";
     }
 
     if (typeof transition === "string") {
@@ -22,59 +22,59 @@ const resolveTransition = (transition: TransitionRef | undefined): string => {
 }
 
 const buildEventState = (state: EventStateDefinition) => {
-   const definition  = `class ${state.name} eventNode`;
-   const transition = `${state.name} --> ${resolveTransition(state.transition)}`
+   const definition  = `${state.name} [id = "${state.name}", shape = box]`;
+   const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
    return [definition, transition].join("\n");
 }
 
 const buildOperationState = (state: OperationStateDefinition) => {
-    const definition  = `class ${state.name} operationNode`;
-    const transition = `${state.name} --> ${resolveTransition(state.transition)}`
+    const definition  = `${state.name} [id = "${state.name}", shape = box, color = blue]`;
+    const transition = `${state.name} -> ${resolveTransition(state.transition)}`
     const onErrorTransitions = state.onErrors?.map(error =>
-        `${state.name} --> ${resolveTransition(error.transition)} : ${error.errorRef}`
+        `${state.name} -> ${resolveTransition(error.transition)} [color = red, style = dashed]`
     ) ?? []
 
     return [definition, transition, ...onErrorTransitions].join("\n");
 }
 
 const buildInjectState = (state: InjectStateDefinition) => {
-    const definition  = `class ${state.name} injectNode`;
-    const transition = `${state.name} --> ${resolveTransition(state.transition)}`
+    const definition  = `${state.name} [id = "${state.name}", shape = box, color = lightblue]`;
+    const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildCallbackState = (state: CallbackState) => {
-    const definition  = `class ${state.name} callbackNode`;
-    const transition = `${state.name} --> ${resolveTransition(state.transition)}`
+    const definition  = `${state.name} [id = "${state.name}", shape = ellipse]`;
+    const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildForeachState = (state: ForeachState) => {
-    const definition  = `class ${state.name} foreachNode`;
-    const transition = `${state.name} --> ${resolveTransition(state.transition)}`
+    const definition  = `${state.name} [shape = circle]`;
+    const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildSwitchState = (state: SwitchStateDefinition) => {
-    const definition  = `class ${state.name} switchNode`;
-    const defaultTransition = `${state.name} --> ${resolveTransition(state.defaultCondition.transition)}: default`
+    const definition  = `${state.name} [shape = hexagon, color = lightgreen]`;
+    const defaultTransition = `${state.name} -> ${resolveTransition(state.defaultCondition.transition)} [style = dashed, label = "default"]`
 
     const conditionalEventTransitions = state.eventConditions?.map(condition =>
-        `${state.name} --> ${resolveTransition(condition.transition)}: ${condition.eventRef}`
+        `${state.name} -> ${resolveTransition(condition.transition)} [label = "${condition.eventRef}"]`
     ) ?? [];
 
     const conditionalDataTransitions = state.dataConditions?.map(condition =>
-        `${state.name} --> ${resolveTransition(condition.transition)}: ${condition.name ?? condition.condition}`
+        `${state.name} -> ${resolveTransition(condition.transition)} [label = "${condition.name ?? condition.condition}"]`
     ) ?? [];
 
     return [definition, defaultTransition, ...conditionalDataTransitions, ...conditionalEventTransitions].join("\n");
 }
 
-export const buildMermaidSourceFromJson = (source: string): string => {
+export const buildGraphvizSourceFromJson = (source: string): string => {
     const workflow = JSON.parse(source) as ServerlessWorkflowDefinition;
     const nodes = workflow.states.map(state => {
         switch (state.type) {
@@ -96,18 +96,11 @@ export const buildMermaidSourceFromJson = (source: string): string => {
     });
 
     return `
-       stateDiagram-v2
-       direction TB
+       digraph {
+           start [shape = circle]
+           start -> ${workflow.start}
        
-       [*] --> ${workflow.start}
-       
-       ${nodes.join("\n")}
-       
-       classDef eventNode stroke:#ffaa00
-       classDef operationNode stroke:#0099ff
-       classDef injectNode stroke:#ff99ff
-       classDef switchNode stroke:#00ff99
-       classDef callbackNode stroke:#ff0000
-       classDef foreachNode stroke:#ff00ff;fill:#ff0000
+           ${nodes.join("\n\n")}
+       }
     `;
 };

@@ -1,18 +1,20 @@
 import {ProcessInstance} from "../types/ProcessInstance.ts";
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useState} from "react";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
 import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
 import {Button, Chip, Spinner, Tab, Tabs} from "@nextui-org/react";
-import {ReactZoomPanPinchRef} from "react-zoom-pan-pinch";
 import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuRefreshCcw} from "react-icons/lu";
 import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {ProcessInstancesListing} from "./ProcessInstancesListing.tsx";
 import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
+import {useProcessInstanceSource} from "../shared/useProcessInstanceSource.tsx";
+import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
+import {useLocalStorage} from "usehooks-ts";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -22,12 +24,12 @@ export type ProcessInstanceDetailProps = {
 
 export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, configuration, reload}) => {
     const {pathname} = useLocation()
-    const graphTransformRef = useRef<ReactZoomPanPinchRef | null>(null);
-    const [selectedTab, setSelectedTab] = useState("variables");
+    const [selectedSmallScreenTab, setSelectedSmallScreenTab] = useLocalStorage("small-screen-tab", "graph");
+    const [selectedLargeScreenTab, setSelectedLargeScreenTab] = useLocalStorage("large-screen-tab", "correlations");
     const [correlatedWorkflowsPage, setCorrelatedWorkflowsPage] = useState(0);
     const loadNextPage = () => setCorrelatedWorkflowsPage(current => current + 1);
     const loadPreviousPage = () => setCorrelatedWorkflowsPage(current => Math.max(current - 1, 0));
-    const {data: correlatedInstancesResponse, isLoading} = useProcessInstances(configuration, {
+    const {data: correlatedInstancesResponse, isLoading: correlatedInstancesLoading} = useProcessInstances(configuration, {
         ...defaultProcessInstancesRequest,
         filter: {
             and: [
@@ -48,12 +50,8 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
         offset: correlatedWorkflowsPage * processInstancesPerPage
     });
 
-    useEffect(() => {
-        setTimeout(() => {
-            graphTransformRef.current?.centerView();
-            graphTransformRef.current?.resetTransform();
-        }, 100);
-    }, []);
+    const {data: sourceResponse, isLoading: sourceCodeLoading} = useProcessInstanceSource(configuration, instance.id);
+    const source = sourceResponse?.sources[0]?.source ?? "";
 
     return (
         <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>
@@ -110,8 +108,8 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     <Tabs
                         color="primary"
                         variant="solid"
-                        selectedKey={selectedTab}
-                        onSelectionChange={(key) => setSelectedTab(key as string)}
+                        selectedKey={selectedSmallScreenTab}
+                        onSelectionChange={(key) => setSelectedSmallScreenTab(key as string)}
                     >
                         <Tab key="variables" title="Workflow variables">
                             <ProcessInstanceVariablesEditor
@@ -123,7 +121,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         </Tab>
                         <Tab key="correlations" title="Correlated workflows">
                             {
-                                isLoading
+                                correlatedInstancesLoading
                                     ? <Spinner/>
                                     : <ProcessInstancesListing
                                         routePrefix={`/server/${configuration.id}`}
@@ -132,6 +130,13 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                         loadNextPage={loadNextPage}
                                         loadPreviousPage={loadPreviousPage}
                                     />
+                            }
+                        </Tab>
+                        <Tab key="graph" title="Workflow graph">
+                            {
+                                sourceCodeLoading
+                                    ? <Spinner/>
+                                    : <ProcessInstanceGraph source={source}/>
                             }
                         </Tab>
                     </Tabs>
@@ -148,22 +153,35 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     </div>
 
                     <div className="flex flex-col">
-                        <div className="col-span-2 h-[70vh] [&>div]:w-full [&>div]:h-full">
-                            <h2 className="text-xs text-center font-medium uppercase tracking-wide my-4">Correlated workflows</h2>
-                            {
-                                isLoading
-                                    ? <Spinner/>
-                                    : <ProcessInstancesListing
-                                        routePrefix={`/server/${configuration.id}`}
-                                        instances={correlatedInstancesResponse?.instances ?? []}
-                                        page={correlatedWorkflowsPage}
-                                        loadNextPage={loadNextPage}
-                                        loadPreviousPage={loadPreviousPage}
-                                    />
-                            }
-                        </div>
+                        <Tabs
+                            color="primary"
+                            variant="solid"
+                            selectedKey={selectedLargeScreenTab}
+                            onSelectionChange={(key) => setSelectedLargeScreenTab(key as string)}
+                        >
+                            <Tab key="correlations" title="Correlated workflows">
+                                <h2 className="text-xs text-center font-medium uppercase tracking-wide my-4">Correlated workflows</h2>
+                                {
+                                    correlatedInstancesLoading
+                                        ? <Spinner/>
+                                        : <ProcessInstancesListing
+                                            routePrefix={`/server/${configuration.id}`}
+                                            instances={correlatedInstancesResponse?.instances ?? []}
+                                            page={correlatedWorkflowsPage}
+                                            loadNextPage={loadNextPage}
+                                            loadPreviousPage={loadPreviousPage}
+                                        />
+                                }
+                            </Tab>
+                            <Tab key="graph" title="Workflow graph">
+                                {
+                                    sourceCodeLoading
+                                        ? <Spinner/>
+                                        : <ProcessInstanceGraph source={source}/>
+                                }
+                            </Tab>
+                        </Tabs>
                     </div>
-
                 </div>
             </main>
         </div>
