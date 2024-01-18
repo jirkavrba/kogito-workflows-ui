@@ -1,12 +1,11 @@
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useEffect, useRef} from "react";
 import {instance} from "@viz-js/viz";
 import {buildGraphvizSourceFromJson} from "../helpers/graph.ts";
 import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
-import {Spinner} from "@nextui-org/react";
 
 export type ProcessInstanceGraphProps = {
     source: string;
-    selectedNode: string | null;
+    selectedNode?: string;
 }
 
 export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, selectedNode}) => {
@@ -23,6 +22,10 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
             const svg = viz.renderSVGElement(
                 buildGraphvizSourceFromJson(source)
             );
+
+            svg.style.aspectRatio = `${svg.style.width.replace("dt", "")}/${svg.style.height.replace("dt", "")}`
+            svg.style.width = "100%";
+            svg.style.maxHeight = "70vh"
 
             current.innerHTML = "";
             current.appendChild(svg);
@@ -43,10 +46,10 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
     }, [selectedNode]);
 
     return (
-        <div className="w-full h-[70vh] bg-blue-200 flex flex-col items-stretch justify-stretch">
+        <div className="w-full h-[70vh] flex flex-col [&>*]:w-full">
             <TransformWrapper ref={transform}>
                 <TransformComponent>
-                    <div className="bg-red-500 w-full h-full" ref={container}/>
+                    <div className="w-full h-full" ref={container}/>
                 </TransformComponent>
             </TransformWrapper>
         </div>

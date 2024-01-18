@@ -15,6 +15,7 @@ import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInsta
 import {useProcessInstanceSource} from "../shared/useProcessInstanceSource.tsx";
 import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
+import {SourceUnavailableError} from "./SourceUnavailableError.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -50,7 +51,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
         offset: correlatedWorkflowsPage * processInstancesPerPage
     });
 
-    const {data: sourceResponse, isLoading: sourceCodeLoading} = useProcessInstanceSource(configuration, instance.id);
+    const {data: sourceResponse, isLoading: sourceCodeLoading, isError: sourceCodeIsError} = useProcessInstanceSource(configuration, instance.id);
     const source = sourceResponse?.sources[0]?.source ?? "";
 
     return (
@@ -136,7 +137,11 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                             {
                                 sourceCodeLoading
                                     ? <Spinner/>
-                                    : <ProcessInstanceGraph source={source}/>
+                                    : (
+                                        sourceCodeIsError
+                                        ? <SourceUnavailableError/>
+                                        : <ProcessInstanceGraph source={source}/>
+                                    )
                             }
                         </Tab>
                     </Tabs>
