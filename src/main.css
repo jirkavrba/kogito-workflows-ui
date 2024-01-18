@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.react-transform-wrapper {
+    width: 100% !important;
+}
