@@ -54,7 +54,7 @@ export const ServerNavbar: FC<ServerNavbarProps> = ({configuration}) => {
             </div>
             <NavLink to="/">
                 {fetching > 0 && <Spinner size="sm" className="mr-2"/>}
-                <Button>
+                <Button variant="ghost">
                     <LuUnplug/>
                     Disconnect
                 </Button>
