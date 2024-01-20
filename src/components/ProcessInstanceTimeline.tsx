@@ -4,6 +4,7 @@ import {useLocalStorage} from "usehooks-ts";
 import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuBadgeCheck, LuCombine, LuFlag, LuFunctionSquare, LuSplit, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
 import TimeAgo from "react-timeago";
 import {Button, ButtonGroup, Divider, ScrollShadow} from "@nextui-org/react";
+import _ from "lodash";
 
 export type ProcessInstanceTimelineProps = {
     timeline: Array<ProcessInstanceTimelineItem>;
@@ -71,29 +72,30 @@ const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
 
 export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timeline, error}) => {
     const [newestFirst, setNewestFirst] = useLocalStorage<boolean>("instance--newest-first-sort", true);
-    const renderedTypes = [
-        "CompositeContextNode",
-        "StartNode",
-        "WorkItemNode",
-        "EventNode",
-        "ActionNode",
-        "Split"
-    ];
+    const sortedTimeline = useMemo(() => {
+            const renderedTypes = [
+                "CompositeContextNode",
+                "StartNode",
+                "WorkItemNode",
+                "EventNode",
+                "ActionNode",
+                "Split"
+            ];
 
-    const ignoredPrefixes = [
-        "Embedded",
-        "Script"
-    ];
+            const ignoredPrefixes = [
+                "Embedded",
+                "Script"
+            ];
 
-    const sorted = useMemo(() =>
-        timeline
-            .filter(node => renderedTypes.includes(node.type) && !ignoredPrefixes.some(prefix => node.name.startsWith(prefix)))
-            .sort((a, b) => {
-                const first = new Date(a.enter).getTime();
-                const second = new Date(b.enter).getTime();
+            const sorted = _.sortBy(
+                timeline.filter(node => renderedTypes.includes(node.type) && !ignoredPrefixes.some(prefix => node.name.startsWith(prefix))),
+                (item: ProcessInstanceTimelineItem) => [item.enter, item.type, item.definitionId]
+            );
 
-                return newestFirst ? (second - first) : (first - second);
-            }), [timeline, newestFirst])
+            return newestFirst ? sorted.reverse() : sorted;
+        },
+        [timeline, newestFirst]
+    );
 
     return (
         <div className="flex flex-col gap-4">
@@ -108,7 +110,7 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
                 </Button>
             </ButtonGroup>
             <ScrollShadow className="h-[70vh]">
-                {sorted.map((item, key) =>
+                {sortedTimeline.map((item, key) =>
                     <TimelineItem item={item} key={key} error={error}/>
                 )}
             </ScrollShadow>
