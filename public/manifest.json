@@ -1,0 +1,21 @@
+{
+  "name": "Kogito Workflows UI",
+  "short_name": "Kogito UI",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#003e4c",
+  "background_color": "#000000",
+  "description": "An user interface for working with Kogito Serverless Workflows.",
+  "icons": [
+    {
+      "src": "kogito-ui.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "kogito-ui@2x.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}
