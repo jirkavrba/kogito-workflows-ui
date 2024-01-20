@@ -20,9 +20,8 @@ export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps>
     };
 
     const deleteConfiguration = (configuration: ServerConfiguration) => {
-        if (confirm(`Do you really want to delete the server configuration [${configuration.name}]?`)) {
-            setConfigurations(current => current.filter(it => it.id !== configuration.id))
-        }
+        setConfigurations(current => current.filter(it => it.id !== configuration.id))
+        setDeleteEnabled(false);
     };
 
     const toggleDeleteEnabled = () => setDeleteEnabled(current => !current);
@@ -30,6 +29,12 @@ export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps>
     return (
         <>
             <div className="flex flex-row gap-4 mb-10">
+                {configurations.length === 0 && (
+                    <div className="border-2 border-dashed p-8 border-default-300 rounded-lg text-default-300 text-sm">
+                        There are no configured data index server connections.<br/>
+                        Use the blue button below to configure a new connection.
+                    </div>
+                )}
                 {configurations.map((configuration) =>
                     deleteEnabled
                         ? (
@@ -48,9 +53,9 @@ export const ServerConfigurationSelection: FC<ServerConfigurationSelectionProps>
             </div>
 
             <div className="flex flex-row gap-4">
-                <Button onClick={onOpen}>Configure a new server connection</Button>
-                <Button onClick={toggleDeleteEnabled}>
-                    {deleteEnabled ? "Finish editing" : "Edit connections"}
+                <Button onClick={onOpen} disabled={deleteEnabled} color={configurations.length === 0 ? "primary" : "default"}>Configure a new server connection</Button>
+                <Button onClick={toggleDeleteEnabled} disabled={configurations.length === 0}>
+                    {deleteEnabled ? "Cancel" : "Delete a connection"}
                 </Button>
             </div>
 

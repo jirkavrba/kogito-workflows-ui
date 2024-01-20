@@ -1,14 +1,29 @@
 import {FC, useMemo} from "react";
 import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../types/ProcessInstance.ts";
 import {useLocalStorage} from "usehooks-ts";
-import {LuArrowDownNarrowWide, LuArrowUpWideNarrow, LuBadgeAlert, LuBadgeCheck, LuCombine, LuFlag, LuFunctionSquare, LuSplit, LuSquareCode, LuTimer, LuZap} from "react-icons/lu";
+import {
+    LuArrowDownNarrowWide,
+    LuArrowUpWideNarrow,
+    LuBadgeAlert,
+    LuBadgeCheck,
+    LuCombine,
+    LuEye, LuEyeOff,
+    LuFlag,
+    LuFunctionSquare,
+    LuSplit,
+    LuSquareCode,
+    LuTimer,
+    LuZap
+} from "react-icons/lu";
 import TimeAgo from "react-timeago";
-import {Button, ButtonGroup, Divider, ScrollShadow} from "@nextui-org/react";
+import {Button, ButtonGroup, Divider, ScrollShadow, Tooltip} from "@nextui-org/react";
 import _ from "lodash";
 
 export type ProcessInstanceTimelineProps = {
-    timeline: Array<ProcessInstanceTimelineItem>;
     error: ProcessInstanceError | null;
+    timeline: Array<ProcessInstanceTimelineItem>;
+    timelineNavigationEnabled?: boolean;
+    onTimelineItemSelect?: (id: string) => void;
 };
 
 const TimelineItemIcon: FC<{ type: string }> = ({type}) => {
@@ -31,9 +46,19 @@ const TimelineItemIcon: FC<{ type: string }> = ({type}) => {
 type TimelineItemProps = {
     item: ProcessInstanceTimelineItem;
     error: ProcessInstanceError | null;
+    navigationEnabled?: boolean;
+    onSelect?: () => void;
 };
 
-const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
+const TimelineItem: FC<TimelineItemProps> = (
+    {
+        item,
+        error,
+        navigationEnabled = false,
+        onSelect = () => {
+        }
+    }
+) => {
     const duration = item.exit !== null ? (new Date(item.exit).getTime() - new Date(item.enter).getTime()) : null;
     const completed = duration !== null;
     const errored = error !== null && item.definitionId == error.nodeDefinitionId && !completed;
@@ -44,11 +69,26 @@ const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
                 <div className="min-w-4">
                     <TimelineItemIcon type={item.type}/>
                 </div>
-                <div className="flex flex-col justify-start items-start">
+                {navigationEnabled && (
+                    ["CompositeContextNode", "Split"].includes(item.type)
+                        ? (
+                            <Button size="sm" isIconOnly onPress={onSelect}>
+                                <LuEye/>
+                            </Button>
+                        )
+                        : (
+                            <Tooltip content="Graph navigation is not supported for this type of node">
+                                <Button size="sm" isIconOnly disabled={true} variant="bordered">
+                                    <LuEyeOff/>
+                                </Button>
+                            </Tooltip>
+                        )
+                )}
+                <div className="flex flex-col justify-start items-start flex-grow">
                     <div className={`flex flex-row justify-start items-center gap-1 text-sm font-medium`}>
-                        {item.name}
                         {completed && <div className="text-success"><LuBadgeCheck/></div>}
                         {errored && <div className="text-danger"><LuBadgeAlert/></div>}
+                        {item.name}
                     </div>
                     <div className="flex flex-row items-center justify-center gap-2 text-xs mt-2">
                         <TimeAgo date={item.enter}/>
@@ -70,7 +110,15 @@ const TimelineItem: FC<TimelineItemProps> = ({item, error}) => {
     )
 };
 
-export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timeline, error}) => {
+export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
+    {
+        timeline,
+        timelineNavigationEnabled = false,
+        onTimelineItemSelect = () => {
+        },
+        error
+    }
+) => {
     const [newestFirst, setNewestFirst] = useLocalStorage<boolean>("instance--newest-first-sort", true);
     const sortedTimeline = useMemo(() => {
             const renderedTypes = [
@@ -89,7 +137,7 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
 
             const sorted = _.sortBy(
                 timeline.filter(node => renderedTypes.includes(node.type) && !ignoredPrefixes.some(prefix => node.name.startsWith(prefix))),
-                (item: ProcessInstanceTimelineItem) => [item.enter, item.type, item.definitionId]
+                (item: ProcessInstanceTimelineItem) => [new Date(item.enter).getTime(), item.nodeId]
             );
 
             return newestFirst ? sorted.reverse() : sorted;
@@ -111,7 +159,7 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = ({timel
             </ButtonGroup>
             <ScrollShadow className="h-[70vh]">
                 {sortedTimeline.map((item, key) =>
-                    <TimelineItem item={item} key={key} error={error}/>
+                    <TimelineItem item={item} key={key} error={error} navigationEnabled={timelineNavigationEnabled} onSelect={() => onTimelineItemSelect(item.name)}/>
                 )}
             </ScrollShadow>
         </div>

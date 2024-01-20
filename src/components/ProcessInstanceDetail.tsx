@@ -25,8 +25,13 @@ export type ProcessInstanceDetailProps = {
 
 export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance, configuration, reload}) => {
     const {pathname} = useLocation()
+
     const [selectedSmallScreenTab, setSelectedSmallScreenTab] = useLocalStorage("small-screen-tab", "graph");
     const [selectedLargeScreenTab, setSelectedLargeScreenTab] = useLocalStorage("large-screen-tab", "correlations");
+
+    const [selectedNode, setSelectedNode] = useState<string | null>(null)
+    const [selectedNodeTimestamp, setSelectedNodeTimestamp] = useState<Date>(new Date());
+
     const [correlatedWorkflowsPage, setCorrelatedWorkflowsPage] = useState(0);
     const loadNextPage = () => setCorrelatedWorkflowsPage(current => current + 1);
     const loadPreviousPage = () => setCorrelatedWorkflowsPage(current => Math.max(current - 1, 0));
@@ -100,12 +105,23 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     </Button>
                 </div>
             </header>
-            <main className="grid grid-row grid-cols-5 flex-grow gap-4">
+            <main className="grid grid-row grid-cols-4 2k:grid-cols-5 flex-grow gap-4">
                 <div>
-                    <ProcessInstanceTimeline timeline={instance.timeline} error={instance.error}/>
+                    <ProcessInstanceTimeline
+                        timeline={instance.timeline}
+                        error={instance.error}
+                        onTimelineItemSelect={(id) => {
+                            setSelectedNode(id);
+                            setSelectedNodeTimestamp(new Date());
+                        }}
+                        timelineNavigationEnabled={
+                            selectedSmallScreenTab === "graph" ||
+                            selectedLargeScreenTab === "graph"
+                        }
+                    />
                 </div>
 
-                <div className="col-span-4 2k:hidden">
+                <div className="col-span-3 2k:hidden">
                     <Tabs
                         color="primary"
                         variant="solid"
@@ -139,8 +155,8 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     ? <Spinner/>
                                     : (
                                         sourceCodeIsError
-                                        ? <SourceUnavailableError/>
-                                        : <ProcessInstanceGraph source={source}/>
+                                            ? <SourceUnavailableError/>
+                                            : <ProcessInstanceGraph source={source} selectedNode={selectedNode} selectedNodeTimestamp={selectedNodeTimestamp}/>
                                     )
                             }
                         </Tab>
@@ -182,7 +198,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                 {
                                     sourceCodeLoading
                                         ? <Spinner/>
-                                        : <ProcessInstanceGraph source={source}/>
+                                        : <ProcessInstanceGraph source={source} selectedNode={selectedNode} selectedNodeTimestamp={selectedNodeTimestamp}/>
                                 }
                             </Tab>
                         </Tabs>
