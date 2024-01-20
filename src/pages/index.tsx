@@ -12,6 +12,8 @@ export const DefaultPage: FC = () => {
 
     return (
         <div className="flex flex-col items-center justify-center w-screen h-screen">
+            <img src="/kogito-ui.svg" alt="Kogito workflows UI icon" className="w-16 h-16 my-4"/>
+            
             <h1 className="text-4xl font-bold mb-10">Kogito Workflows UI</h1>
 
             <ServerConfigurationSelection onSelect={onServerConfigurationSelected}/>
