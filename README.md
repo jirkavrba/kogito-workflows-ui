@@ -1,4 +1,4 @@
-<img src="./public/kogito.svg" width="50">
+<img src="./public/kogito-ui.svg" width="64">
 
 # Kogito Workflows UI
 
