@@ -152,11 +152,12 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                 language="json"
                 value={updatedValue}
                 loading={<Spinner size="lg"/>}
-                theme={"kogito"}
+                theme={"vs-dark"}
+                className="rounded-lg [&>*]:rounded-lg mr-4"
                 onChange={(value) => setUpdatedValue(value ?? "")}
                 options={{
                     lineNumbers: "off",
-                    theme: "kogito",
+                    theme: "vs-dark",
                     contextmenu: false,
                     cursorSmoothCaretAnimation: "on",
                     bracketPairColorization: {

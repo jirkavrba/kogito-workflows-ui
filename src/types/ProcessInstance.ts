@@ -58,6 +58,7 @@ export type ProcessInstance = {
     variables: object;
     start: string;
     lastUpdate: string;
+    endpoint: string;
 }
 
 export type ProcessInstanceArgument = {

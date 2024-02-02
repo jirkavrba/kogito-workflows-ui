@@ -71,7 +71,7 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
         <div className="w-full h-[70vh] flex flex-col [&>*]:w-full">
             <TransformWrapper ref={transform}>
                 <TransformComponent>
-                    <div className="w-full h-full" ref={container}/>
+                    <div className="w-full h-[70vh]" ref={container}/>
                 </TransformComponent>
             </TransformWrapper>
         </div>
