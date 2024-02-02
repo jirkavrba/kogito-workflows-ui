@@ -5,9 +5,9 @@ import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
 import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
-import {Button, Chip, Spinner, Tab, Tabs} from "@nextui-org/react";
+import {Button, ButtonGroup, Spinner, Tab, Tabs, Tooltip} from "@nextui-org/react";
 import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
-import {LuArrowLeft, LuRefreshCcw} from "react-icons/lu";
+import {LuArrowLeft, LuCopy, LuRefreshCcw} from "react-icons/lu";
 import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {ProcessInstancesListing} from "./ProcessInstancesListing.tsx";
@@ -75,20 +75,30 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                             {instance.state}
                         </div>
                     </div>
-                    <div>
-                        <Chip color="default" variant="bordered" size="sm" className="my-2">
-                            Instance ID: {instance.id}
-                        </Chip>
+                    <div className="mb-2">
+                        <Tooltip content="Process instance ID">
+                            <Button size="sm" onClick={() => navigator.clipboard.writeText(instance.id)}>
+                                {instance.id}
+                                <LuCopy/>
+                            </Button>
+                        </Tooltip>
                     </div>
-                    <div>
-                        {
-                            instance.businessKey && (
-                                <Chip color="default" size="sm">
-                                    Business key: {instance.businessKey}
-                                </Chip>
-                            )
-                        }
-                    </div>
+                    {instance.businessKey && (
+                        <Tooltip content="Process business key">
+                            <ButtonGroup>
+                                {
+                                    instance.businessKey.split("#").map(((part, i) =>
+                                            <>
+                                                <Button key={i} size="sm" onClick={() => navigator.clipboard.writeText(part)}>
+                                                    {part}
+                                                    <LuCopy/>
+                                                </Button>
+                                            </>
+                                    ))
+                                }
+                            </ButtonGroup>
+                        </Tooltip>
+                    )}
                 </div>
                 <div className="flex flex-col items-end justify-end text-sm gap-1">
                     <p className="opacity-90">
