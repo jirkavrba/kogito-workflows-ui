@@ -26,25 +26,26 @@ export type ProcessInstanceTimelineProps = {
     onTimelineItemSelect?: (id: string) => void;
 };
 
-const TimelineItemIcon: FC<{ type: string }> = ({type}) => {
+const TimelineItemIcon: FC<{ type: string, className?: string }> = ({type, className = ""}) => {
     switch (type) {
         case "CompositeContextNode":
-            return <LuCombine/>;
+            return <LuCombine className={className}/>;
         case "StartNode":
-            return <LuFlag/>;
+            return <LuFlag className={className}/>;
         case "EventNode":
-            return <LuZap/>;
+            return <LuZap className={className}/>;
         case "WorkItemNode":
-            return <LuSquareCode/>
+            return <LuSquareCode className={className}/>
         case "ActionNode":
-            return <LuFunctionSquare/>;
+            return <LuFunctionSquare className={className}/>;
         case "Split":
-            return <LuSplit/>;
+            return <LuSplit className={className}/>;
     }
 };
 
 type TimelineItemProps = {
     item: ProcessInstanceTimelineItem;
+    index: number;
     error: ProcessInstanceError | null;
     navigationEnabled?: boolean;
     onSelect?: () => void;
@@ -53,6 +54,7 @@ type TimelineItemProps = {
 const TimelineItem: FC<TimelineItemProps> = (
     {
         item,
+        index,
         error,
         navigationEnabled = false,
         onSelect = () => {
@@ -67,7 +69,7 @@ const TimelineItem: FC<TimelineItemProps> = (
         <>
             <div className="flex flex-row items-center justify-start p-4 gap-4">
                 <div className="min-w-4">
-                    <TimelineItemIcon type={item.type}/>
+                    <TimelineItemIcon type={item.type} className={completed ? "text-neutral-500" : "text-warning"}/>
                 </div>
                 {navigationEnabled && (
                     ["CompositeContextNode", "Split"].includes(item.type)
@@ -103,6 +105,10 @@ const TimelineItem: FC<TimelineItemProps> = (
                             </div>
                         )
                     }
+                    <span className="text-default-400 text-xs font-mono mt-1">
+                        index: {index} &bull;
+                        id: {item.definitionId}
+                    </span>
                 </div>
             </div>
             <Divider/>
@@ -158,8 +164,13 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
                 </Button>
             </ButtonGroup>
             <ScrollShadow className="h-[70vh]">
-                {sortedTimeline.map((item, key) =>
-                    <TimelineItem item={item} key={key} error={error} navigationEnabled={timelineNavigationEnabled} onSelect={() => onTimelineItemSelect(item.name)}/>
+                {sortedTimeline.map((item, index) =>
+                    <TimelineItem item={item}
+                                  key={index}
+                                  index={newestFirst ? (sortedTimeline.length - index) : (index + 1)}
+                                  error={error}
+                                  navigationEnabled={timelineNavigationEnabled}
+                                  onSelect={() => onTimelineItemSelect(item.name)}/>
                 )}
             </ScrollShadow>
         </div>
