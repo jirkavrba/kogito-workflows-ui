@@ -25,7 +25,12 @@ const validate = (json: string) => {
 }
 
 const jsonEquals = (first: string, second: string) => {
-    return JSON.stringify(JSON.parse(first)) === JSON.stringify(JSON.parse(second));
+    try {
+        return JSON.stringify(JSON.parse(first)) === JSON.stringify(JSON.parse(second));
+    }
+    catch {
+        return false;
+    }
 }
 
 export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorProps> = ({variables, configuration, id, processName}) => {
@@ -35,7 +40,7 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
     const [updatedValue, setUpdatedValue] = useState(originalValue)
 
     const updatedValueValid = useMemo(() => validate(updatedValue), [updatedValue]);
-    const pendingChanges = useMemo(() => updatedValueValid && !jsonEquals(originalValue, updatedValue), [updatedValueValid, originalValue, updatedValue]);
+    const pendingChanges = useMemo(() => !jsonEquals(originalValue, updatedValue), [originalValue, updatedValue]);
 
     const {isOpen: updatedValueDiffOpen, onOpen: openUpdatedValueDiff, onClose: closeUpdatedValueDiff} = useDisclosure();
 
@@ -79,12 +84,17 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
     };
 
     useEffect(() => {
-        const formatted = JSON.stringify(variables, null, 2);
+        try {
+            const formatted = JSON.stringify(variables, null, 2);
 
-        setOriginalValue(formatted);
+            setOriginalValue(formatted);
 
-        if (!pendingChanges) {
-            setUpdatedValue(formatted)
+            if (!pendingChanges) {
+                setUpdatedValue(formatted)
+            }
+        }
+        catch {
+            console.error("Not valid json")
         }
     }, [variables, pendingChanges]);
 
@@ -103,12 +113,6 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
 
     return (
         <>
-            {!updatedValueValid && (
-                <div className="flex flex-col items-start justify-start bg-danger p-4 rounded-lg mb-2">
-                    <h3 className="text-sm font-medium">Invalid JSON</h3>
-                    <p className="text-xs">Updating workflow variables will fail.</p>
-                </div>
-            )}
             {!pendingChanges && (
                 <div className="mb-3">
                     <Button size="sm" onClick={createSnapshot}>Create a new snapshot of the workflow variables</Button>
@@ -127,27 +131,29 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
 
                 </div>
             )}
-            {pendingChanges && (
-                <div className="flex flex-row items-center justify-between bg-default-100 p-2 px-4 rounded-lg mb-2">
-                    <h3 className="text-sm font-medium">
-                        Workflow variables changed
-                    </h3>
-                    <ButtonGroup>
-                        <Button onClick={() => setUpdatedValue(originalValue)} disabled={isPending}>
-                            <LuTrash/>
-                            Discard changes
-                        </Button>
-                        <Button onClick={openUpdatedValueDiff} disabled={isPending}>
-                            <LuDiff/>
-                            View diff
-                        </Button>
-                        <Button color="primary" onClick={() => updateWorkflowVariables(updatedValue)} isLoading={isPending} disabled={isPending}>
-                            <LuSave/>
-                            Save
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            )}
+            <div>
+                {pendingChanges && (
+                    <div className="flex flex-row items-center justify-between bg-default-100 p-2 px-4 rounded-lg mb-2">
+                        <h3 className="text-sm font-medium">
+                            Workflow variables changed
+                        </h3>
+                        <ButtonGroup>
+                            <Button onClick={() => setUpdatedValue(originalValue)} disabled={isPending}>
+                                <LuTrash/>
+                                Discard changes
+                            </Button>
+                            <Button onClick={openUpdatedValueDiff} disabled={isPending}>
+                                <LuDiff/>
+                                View diff
+                            </Button>
+                            <Button color={updatedValueValid ? "primary" : "danger"} onClick={() => updateWorkflowVariables(updatedValue)} isLoading={isPending} disabled={isPending || !updatedValueValid}>
+                                <LuSave/>
+                                {updatedValueValid ? "Save" : "Invalid JSON"}
+                            </Button>
+                        </ButtonGroup>
+                    </div>
+                )}
+            </div>
             <Editor
                 language="json"
                 value={updatedValue}
