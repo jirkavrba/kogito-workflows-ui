@@ -11,35 +11,38 @@ import {WorkflowVariablesSnapshot} from "../types/Editors.ts";
 export type ProcessInstanceVariablesEditorProps = {
     id: string;
     variables: object;
-    configuration: ServerConfiguration;
     processName: string;
+    configuration: ServerConfiguration;
 };
 
-const validate = (json: string) => {
+const isValidJson = (json: string) => {
     try {
         JSON.parse(json);
         return true
     } catch {
         return false;
     }
-}
+};
 
 const jsonEquals = (first: string, second: string) => {
-    try {
-        return JSON.stringify(JSON.parse(first)) === JSON.stringify(JSON.parse(second));
-    }
-    catch {
-        return false;
-    }
+    return (
+        isValidJson(first) &&
+        isValidJson(second) &&
+        JSON.stringify(JSON.parse(first)) === JSON.stringify(JSON.parse(second))
+    );
+};
+
+const formatJson = (json: object): string => {
+    return JSON.stringify(json, null, 2);
 }
 
 export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorProps> = ({variables, configuration, id, processName}) => {
     const monaco = useMonaco();
 
-    const [originalValue, setOriginalValue] = useState(JSON.stringify(variables, null, 2));
+    const [originalValue, setOriginalValue] = useState(formatJson(variables));
     const [updatedValue, setUpdatedValue] = useState(originalValue)
 
-    const updatedValueValid = useMemo(() => validate(updatedValue), [updatedValue]);
+    const updatedValueValid = useMemo(() => isValidJson(updatedValue), [updatedValue]);
     const pendingChanges = useMemo(() => !jsonEquals(originalValue, updatedValue), [originalValue, updatedValue]);
 
     const {isOpen: updatedValueDiffOpen, onOpen: openUpdatedValueDiff, onClose: closeUpdatedValueDiff} = useDisclosure();
@@ -92,8 +95,7 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
             if (!pendingChanges) {
                 setUpdatedValue(formatted)
             }
-        }
-        catch {
+        } catch {
             console.error("Not valid json")
         }
     }, [variables, pendingChanges]);
@@ -146,7 +148,8 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                                 <LuDiff/>
                                 View diff
                             </Button>
-                            <Button color={updatedValueValid ? "primary" : "danger"} onClick={() => updateWorkflowVariables(updatedValue)} isLoading={isPending} disabled={isPending || !updatedValueValid}>
+                            <Button color={updatedValueValid ? "primary" : "danger"} onClick={() => updateWorkflowVariables(updatedValue)} isLoading={isPending}
+                                    disabled={isPending || !updatedValueValid}>
                                 <LuSave/>
                                 {updatedValueValid ? "Save" : "Invalid JSON"}
                             </Button>
