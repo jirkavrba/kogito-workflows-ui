@@ -19,10 +19,13 @@ import TimeAgo from "react-timeago";
 import {Button, ButtonGroup, Divider, ScrollShadow, Tooltip} from "@nextui-org/react";
 import _ from "lodash";
 import {ProcessInstanceEventTriggerModal} from "./ProcessInstanceEventTriggerModal.tsx";
+import {ServerConfiguration} from "../../../types/ServerConfiguration.ts";
 
 export type ProcessInstanceTimelineProps = {
     error: ProcessInstanceError | null;
     serviceUrl: string;
+    id: string;
+    configuration: ServerConfiguration;
     timeline: Array<ProcessInstanceTimelineItem>;
     timelineNavigationEnabled?: boolean;
     onTimelineItemSelect?: (id: string) => void;
@@ -131,7 +134,9 @@ const TimelineItem: FC<TimelineItemProps> = (
 
 export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
     {
+        id,
         serviceUrl,
+        configuration,
         timeline,
         timelineNavigationEnabled = false,
         onTimelineItemSelect = () => {},
@@ -197,6 +202,8 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
                     serviceUrl={serviceUrl}
                     eventName={selectedEventTrigger}
                     onClose={() => setSelectedEventTrigger(null)}
+                    configuration={configuration}
+                    id={id}
                 />
             )}
         </>

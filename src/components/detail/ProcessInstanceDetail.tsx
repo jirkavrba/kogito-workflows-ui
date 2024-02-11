@@ -118,6 +118,8 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
             <main className="grid grid-row grid-cols-4 2k:grid-cols-5 flex-grow gap-4">
                 <div>
                     <ProcessInstanceTimeline
+                        id={instance.id}
+                        configuration={configuration}
                         serviceUrl={instance.serviceUrl}
                         timeline={instance.timeline}
                         error={instance.error}

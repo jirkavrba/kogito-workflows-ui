@@ -1,19 +1,48 @@
-import {FC, useState} from "react";
+import {FC, useMemo, useState} from "react";
 import {Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea} from "@nextui-org/react";
 import {LuZap} from "react-icons/lu";
+import {useTriggerEventMutation} from "../../../shared/useTriggerEventMutation.tsx";
+import {isValidJson} from "../../../helpers/json.ts";
+import {useQueryClient} from "@tanstack/react-query";
+import {ServerConfiguration} from "../../../types/ServerConfiguration.ts";
 
 export type ProcessInstanceEventTriggerModalProps = {
     serviceUrl: string;
     eventName: string;
     onClose: () => void;
+    id: string;
+    configuration: ServerConfiguration;
 };
 
-export const ProcessInstanceEventTriggerModal: FC<ProcessInstanceEventTriggerModalProps> = ({serviceUrl, eventName, onClose}) => {
+export const ProcessInstanceEventTriggerModal: FC<ProcessInstanceEventTriggerModalProps> = ({serviceUrl, eventName, onClose, configuration, id}) => {
     const eventEndpoint = `${serviceUrl}/${eventName}`
 
     const [eventData, setEventData] = useState("{}");
     const [correlationHeaderName, setCorrelationHeaderName] = useState("");
     const [correlationHeaderValue, setCorrelationHeaderValue] = useState("");
+
+    const {mutate} = useTriggerEventMutation(eventEndpoint, eventName);
+
+    const hasValidPayload = useMemo(() => isValidJson(eventData), [eventData]);
+
+    const client = useQueryClient();
+    const triggerEvent = () => {
+        const data = eventData
+        const extensions = {[correlationHeaderName]: correlationHeaderValue};
+
+        mutate(
+            {data, extensions},
+            {
+                onSuccess: () => {
+                    onClose();
+                    setTimeout(async () => {
+                        await client.invalidateQueries({
+                            queryKey: [`instances#${configuration.id}#${id}`]
+                        })
+                    }, 250);
+                }
+            });
+    }
 
     return (
         <Modal isOpen={true} onClose={onClose} size="5xl">
@@ -45,9 +74,9 @@ export const ProcessInstanceEventTriggerModal: FC<ProcessInstanceEventTriggerMod
                     />
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="warning">
+                    <Button color={hasValidPayload ? "warning" : "default"} disabled={!hasValidPayload} onClick={triggerEvent}>
                         <LuZap/>
-                        Trigger event
+                        {hasValidPayload ? "Trigger event" : "Invalid JSON"}
                     </Button>
                 </ModalFooter>
             </ModalContent>
