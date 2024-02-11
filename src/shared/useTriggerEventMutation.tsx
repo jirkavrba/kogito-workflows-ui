@@ -23,7 +23,10 @@ export const useTriggerEventMutation = (event: string) => {
 
             await fetch(request.endpoint, {
                 method: "post",
-                body: toFormattedJson(payload)
+                body: toFormattedJson(payload),
+                headers: {
+                    "X-Correlation-Id": uuid()
+                },
             });
         }
     })
