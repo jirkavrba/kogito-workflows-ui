@@ -55,6 +55,7 @@ export const useProcessInstance = (
                     variables
                     lastUpdate
                     endpoint
+                    serviceUrl
                   }
                 }
             `, {

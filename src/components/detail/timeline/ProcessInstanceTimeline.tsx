@@ -1,5 +1,5 @@
-import {FC, useMemo} from "react";
-import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../../types/ProcessInstance.ts";
+import {FC, useMemo, useState} from "react";
+import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../../../types/ProcessInstance.ts";
 import {useLocalStorage} from "usehooks-ts";
 import {
     LuArrowDownNarrowWide,
@@ -18,9 +18,11 @@ import {
 import TimeAgo from "react-timeago";
 import {Button, ButtonGroup, Divider, ScrollShadow, Tooltip} from "@nextui-org/react";
 import _ from "lodash";
+import {ProcessInstanceEventTriggerModal} from "./ProcessInstanceEventTriggerModal.tsx";
 
 export type ProcessInstanceTimelineProps = {
     error: ProcessInstanceError | null;
+    serviceUrl: string;
     timeline: Array<ProcessInstanceTimelineItem>;
     timelineNavigationEnabled?: boolean;
     onTimelineItemSelect?: (id: string) => void;
@@ -48,7 +50,8 @@ type TimelineItemProps = {
     index: number;
     error: ProcessInstanceError | null;
     navigationEnabled?: boolean;
-    onSelect?: () => void;
+    onGraphNodeSelect?: () => void;
+    onEventNodeSelect?: () => void;
 };
 
 const TimelineItem: FC<TimelineItemProps> = (
@@ -57,8 +60,10 @@ const TimelineItem: FC<TimelineItemProps> = (
         index,
         error,
         navigationEnabled = false,
-        onSelect = () => {
-        }
+        onGraphNodeSelect = () => {
+        },
+        onEventNodeSelect = () => {
+        },
     }
 ) => {
     const duration = item.exit !== null ? (new Date(item.exit).getTime() - new Date(item.enter).getTime()) : null;
@@ -74,7 +79,7 @@ const TimelineItem: FC<TimelineItemProps> = (
                 {navigationEnabled && (
                     ["CompositeContextNode", "Split"].includes(item.type)
                         ? (
-                            <Button size="sm" isIconOnly onPress={onSelect}>
+                            <Button size="sm" isIconOnly onPress={onGraphNodeSelect}>
                                 <LuEye/>
                             </Button>
                         )
@@ -91,6 +96,9 @@ const TimelineItem: FC<TimelineItemProps> = (
                         {completed && <div className="text-success"><LuBadgeCheck/></div>}
                         {errored && <div className="text-danger"><LuBadgeAlert/></div>}
                         {item.name}
+                        <span className="text-default-400 text-xs font-mono mt-1">
+                            &nbsp;&bull; {index}
+                        </span>
                     </div>
                     <div className="flex flex-row items-center justify-center gap-2 text-xs mt-2">
                         <TimeAgo date={item.enter}/>
@@ -105,11 +113,16 @@ const TimelineItem: FC<TimelineItemProps> = (
                             </div>
                         )
                     }
-                    <span className="text-default-400 text-xs font-mono mt-1">
-                        index: {index} &bull;
-                        id: {item.definitionId}
-                    </span>
                 </div>
+                {
+                    (!completed && item.type === "EventNode") && (
+                        <Tooltip content="Trigger this event">
+                            <Button isIconOnly variant="ghost" color="warning" onClick={onEventNodeSelect}>
+                                <LuZap/>
+                            </Button>
+                        </Tooltip>
+                    )
+                }
             </div>
             <Divider/>
         </>
@@ -118,13 +131,14 @@ const TimelineItem: FC<TimelineItemProps> = (
 
 export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
     {
+        serviceUrl,
         timeline,
         timelineNavigationEnabled = false,
-        onTimelineItemSelect = () => {
-        },
+        onTimelineItemSelect = () => {},
         error
     }
 ) => {
+    const [selectedEventTrigger, setSelectedEventTrigger] = useState<string | null>(null);
     const [newestFirst, setNewestFirst] = useLocalStorage<boolean>("instance--newest-first-sort", true);
     const sortedTimeline = useMemo(() => {
             const renderedTypes = [
@@ -152,27 +166,39 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
     );
 
     return (
-        <div className="flex flex-col gap-4">
-            <ButtonGroup>
-                <Button size="sm" color={newestFirst ? "primary" : "default"} onClick={() => setNewestFirst(true)}>
-                    <LuArrowDownNarrowWide/>
-                    Newest first
-                </Button>
-                <Button size="sm" color={newestFirst ? "default" : "primary"} onClick={() => setNewestFirst(false)}>
-                    <LuArrowUpWideNarrow/>
-                    Oldest first
-                </Button>
-            </ButtonGroup>
-            <ScrollShadow className="h-[70vh]">
-                {sortedTimeline.map((item, index) =>
-                    <TimelineItem item={item}
-                                  key={index}
-                                  index={newestFirst ? (sortedTimeline.length - index) : (index + 1)}
-                                  error={error}
-                                  navigationEnabled={timelineNavigationEnabled}
-                                  onSelect={() => onTimelineItemSelect(item.name)}/>
-                )}
-            </ScrollShadow>
-        </div>
+        <>
+            <div className="flex flex-col gap-4">
+                <ButtonGroup>
+                    <Button size="sm" color={newestFirst ? "primary" : "default"} onClick={() => setNewestFirst(true)}>
+                        <LuArrowDownNarrowWide/>
+                        Newest first
+                    </Button>
+                    <Button size="sm" color={newestFirst ? "default" : "primary"} onClick={() => setNewestFirst(false)}>
+                        <LuArrowUpWideNarrow/>
+                        Oldest first
+                    </Button>
+                </ButtonGroup>
+                <ScrollShadow className="h-[70vh]">
+                    {sortedTimeline.map((item, index) =>
+                        <TimelineItem
+                            item={item}
+                            key={index}
+                            index={newestFirst ? (sortedTimeline.length - index) : (index + 1)}
+                            error={error}
+                            navigationEnabled={timelineNavigationEnabled}
+                            onGraphNodeSelect={() => onTimelineItemSelect(item.name)}
+                            onEventNodeSelect={() => setSelectedEventTrigger(item.name)}
+                        />
+                    )}
+                </ScrollShadow>
+            </div>
+            {selectedEventTrigger !== null && (
+                <ProcessInstanceEventTriggerModal
+                    serviceUrl={serviceUrl}
+                    eventName={selectedEventTrigger}
+                    onClose={() => setSelectedEventTrigger(null)}
+                />
+            )}
+        </>
     );
 };

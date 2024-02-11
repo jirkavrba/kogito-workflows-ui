@@ -59,6 +59,7 @@ export type ProcessInstance = {
     start: string;
     lastUpdate: string;
     endpoint: string;
+    serviceUrl: string;
 }
 
 export type ProcessInstanceArgument = {

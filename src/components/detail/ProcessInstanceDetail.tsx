@@ -6,7 +6,7 @@ import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
 import {Button, ButtonGroup, Spinner, Tab, Tabs, Tooltip} from "@nextui-org/react";
-import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
+import {ProcessInstanceTimeline} from "./timeline/ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuCopy, LuRefreshCcw} from "react-icons/lu";
 import {ProcessInstanceVariablesEditor} from "./variables/ProcessInstanceVariablesEditor.tsx";
 import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
@@ -118,6 +118,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
             <main className="grid grid-row grid-cols-4 2k:grid-cols-5 flex-grow gap-4">
                 <div>
                     <ProcessInstanceTimeline
+                        serviceUrl={instance.serviceUrl}
                         timeline={instance.timeline}
                         error={instance.error}
                         onTimelineItemSelect={(id) => {
