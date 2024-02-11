@@ -1,5 +1,5 @@
 import {FC, useState} from "react";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import {Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader} from "@nextui-org/react";
 
 export type ServerConfigurationModalProps = {

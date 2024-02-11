@@ -1,21 +1,21 @@
-import {ProcessInstance} from "../types/ProcessInstance.ts";
+import {ProcessInstance} from "../../types/ProcessInstance.ts";
 import {FC, useState} from "react";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
-import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
+import {stateBorderColors, stateTextColors} from "../../helpers/colors.ts";
 import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
 import {Button, ButtonGroup, Spinner, Tab, Tabs, Tooltip} from "@nextui-org/react";
-import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
+import {ProcessInstanceTimeline} from "./timeline/ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuCopy, LuRefreshCcw} from "react-icons/lu";
-import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
-import {ProcessInstancesListing} from "./ProcessInstancesListing.tsx";
-import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
-import {useProcessInstanceSource} from "../shared/useProcessInstanceSource.tsx";
+import {ProcessInstanceVariablesEditor} from "./variables/ProcessInstanceVariablesEditor.tsx";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
+import {ProcessInstancesListing} from "../listing/ProcessInstancesListing.tsx";
+import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../../shared/useProcessInstances.tsx";
+import {useProcessInstanceSource} from "../../shared/useProcessInstanceSource.tsx";
 import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
-import {SourceUnavailableError} from "./SourceUnavailableError.tsx";
+import {SourceUnavailableError} from "../SourceUnavailableError.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -118,6 +118,9 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
             <main className="grid grid-row grid-cols-4 2k:grid-cols-5 flex-grow gap-4">
                 <div>
                     <ProcessInstanceTimeline
+                        id={instance.id}
+                        configuration={configuration}
+                        serviceUrl={instance.serviceUrl}
                         timeline={instance.timeline}
                         error={instance.error}
                         onTimelineItemSelect={(id) => {

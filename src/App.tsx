@@ -8,8 +8,6 @@ import {ProcessInstancePage} from "./pages/instance.tsx";
 const client = new QueryClient();
 
 export const App = () => {
-    // const navigate = useNavigate();
-
     return (
         <NextUIProvider>
             <QueryClientProvider client={client}>

@@ -2,10 +2,10 @@ import dateformat from "dateformat";
 import TimeAgo from "react-timeago";
 import {FC, useMemo} from "react";
 import {NavLink} from "react-router-dom";
-import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
+import {ProcessInstanceStateIcon} from "../detail/ProcessInstanceStateIcon.tsx";
 import {Button, Card, CardBody, Chip} from "@nextui-org/react";
-import {AggregatedProcessInstance} from "../types/ProcessInstance.ts";
-import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
+import {AggregatedProcessInstance} from "../../types/ProcessInstance.ts";
+import {stateBorderColors, stateTextColors} from "../../helpers/colors.ts";
 
 
 const ProcessInstanceItem: FC<AggregatedProcessInstance> =

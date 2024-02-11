@@ -1,10 +1,10 @@
 import {FC, useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useServerConfiguration} from "../shared/useServerConfiguration.tsx";
-import {ServerNavbar} from "../components/ServerNavbar.tsx";
+import {ServerNavbar} from "../components/servers/ServerNavbar.tsx";
 import {Spinner} from "@nextui-org/react";
 import {useProcessInstance} from "../shared/useProcessInstance.tsx";
-import {ProcessInstanceDetail} from "../components/ProcessInstanceDetail.tsx";
+import {ProcessInstanceDetail} from "../components/detail/ProcessInstanceDetail.tsx";
 
 const Loader: FC = () => {
     return (
