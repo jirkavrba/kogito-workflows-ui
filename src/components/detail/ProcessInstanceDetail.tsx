@@ -8,7 +8,7 @@ import dateformat from "dateformat";
 import {Button, ButtonGroup, Spinner, Tab, Tabs, Tooltip} from "@nextui-org/react";
 import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuCopy, LuRefreshCcw} from "react-icons/lu";
-import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
+import {ProcessInstanceVariablesEditor} from "./variables/ProcessInstanceVariablesEditor.tsx";
 import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import {ProcessInstancesListing} from "../listing/ProcessInstancesListing.tsx";
 import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../../shared/useProcessInstances.tsx";
