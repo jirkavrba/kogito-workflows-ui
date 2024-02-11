@@ -2,11 +2,11 @@ import {FC, useEffect, useMemo, useState} from "react";
 import {DiffEditor, Editor, useMonaco} from "@monaco-editor/react";
 import {Button, ButtonGroup, Modal, ModalBody, ModalContent, Spinner, Tooltip, useDisclosure} from "@nextui-org/react";
 import {LuDiff, LuSave, LuTrash, LuUndoDot} from "react-icons/lu";
-import {useWorkflowVariablesMutation} from "../shared/useWorkflowVariablesMutation.tsx";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {useWorkflowVariablesMutation} from "../../shared/useWorkflowVariablesMutation.tsx";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {useLocalStorage} from "usehooks-ts";
-import {WorkflowVariablesSnapshot} from "../types/Editors.ts";
+import {WorkflowVariablesSnapshot} from "../../types/Editors.ts";
 
 export type ProcessInstanceVariablesEditorProps = {
     id: string;

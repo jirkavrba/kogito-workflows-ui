@@ -1,13 +1,13 @@
 import {FC, useMemo, useState} from "react";
 import {useParams} from "react-router-dom";
 import {useServerConfiguration} from "../shared/useServerConfiguration.tsx";
-import {ServerNavbar} from "../components/ServerNavbar.tsx";
+import {ServerNavbar} from "../components/servers/ServerNavbar.tsx";
 import {buildProcessInstancesFilter, defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
-import {ConnectionError} from "../components/ConnectionError.tsx";
-import {ProcessInstancesListing} from "../components/ProcessInstancesListing.tsx";
+import {ConnectionError} from "../components/listing/ConnectionError.tsx";
+import {ProcessInstancesListing} from "../components/listing/ProcessInstancesListing.tsx";
 import {Spinner} from "@nextui-org/react";
 import {useProcessDefinitions} from "../shared/useProcessDefinitions.tsx";
-import {ProcessInstancesFilter} from "../components/ProcessInstancesFilter.tsx";
+import {ProcessInstancesFilter} from "../components/listing/ProcessInstancesFilter.tsx";
 import {ProcessInstanceState} from "../types/ProcessInstance.ts";
 import {LuGitlab} from "react-icons/lu";
 import {version} from "../version.ts";

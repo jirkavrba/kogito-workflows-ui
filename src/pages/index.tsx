@@ -1,6 +1,6 @@
 import {FC} from "react";
 import {version} from "../version";
-import {ServerConfigurationSelection} from "../components/ServerConfigurationSelection.tsx";
+import {ServerConfigurationSelection} from "../components/servers/ServerConfigurationSelection.tsx";
 import {useNavigate} from "react-router-dom";
 import {LuGitlab} from "react-icons/lu";
 

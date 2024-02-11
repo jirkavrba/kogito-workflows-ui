@@ -1,6 +1,6 @@
 import {FC, useState} from "react";
-import {useServerConfigurations} from "../shared/useServerConfiguration.tsx";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {useServerConfigurations} from "../../shared/useServerConfiguration.tsx";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import ServerConfigurationModal from "./ServerConfigurationModal.tsx";
 import {Button, useDisclosure} from "@nextui-org/react";
 import {CgPlug, CgTrash} from "react-icons/cg";

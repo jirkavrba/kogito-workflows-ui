@@ -1,6 +1,6 @@
 import {FC, useEffect, useRef} from "react";
 import {instance} from "@viz-js/viz";
-import {buildGraphvizSourceFromJson} from "../helpers/graph.ts";
+import {buildGraphvizSourceFromJson} from "../../helpers/graph.ts";
 import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
 
 export type ProcessInstanceGraphProps = {

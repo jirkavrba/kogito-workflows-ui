@@ -1,5 +1,5 @@
 import {FC, useMemo} from "react";
-import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../types/ProcessInstance.ts";
+import {ProcessInstanceError, ProcessInstanceTimelineItem} from "../../types/ProcessInstance.ts";
 import {useLocalStorage} from "usehooks-ts";
 import {
     LuArrowDownNarrowWide,

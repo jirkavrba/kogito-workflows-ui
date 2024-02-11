@@ -1,8 +1,8 @@
 import {FC, useEffect, useState} from "react";
-import {ProcessDefinition} from "../shared/useProcessDefinitions.tsx";
+import {ProcessDefinition} from "../../shared/useProcessDefinitions.tsx";
 import {Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
 import {LuRefreshCcw} from "react-icons/lu";
-import {availableProcessInstanceStates, ProcessInstanceState} from "../types/ProcessInstance.ts";
+import {availableProcessInstanceStates, ProcessInstanceState} from "../../types/ProcessInstance.ts";
 
 export type ProcessInstancesFilterState = {
     processNames: Array<string> | null,

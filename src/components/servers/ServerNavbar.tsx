@@ -1,10 +1,10 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import {FC} from "react";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner} from "@nextui-org/react";
 import {useIsFetching} from "@tanstack/react-query";
 import {LuPlug, LuUnplug} from "react-icons/lu";
-import {useServerConfigurations} from "../shared/useServerConfiguration.tsx";
+import {useServerConfigurations} from "../../shared/useServerConfiguration.tsx";
 
 export type ServerNavbarProps = {
     configuration: ServerConfiguration;

@@ -1,7 +1,7 @@
-import {ProcessInstance} from "../types/ProcessInstance.ts";
+import {ProcessInstance} from "../../types/ProcessInstance.ts";
 import {FC, useState} from "react";
 import {ProcessInstanceStateIcon} from "./ProcessInstanceStateIcon.tsx";
-import {stateBorderColors, stateTextColors} from "../helpers/colors.ts";
+import {stateBorderColors, stateTextColors} from "../../helpers/colors.ts";
 import {NavLink, useLocation} from "react-router-dom";
 import TimeAgo from "react-timeago";
 import dateformat from "dateformat";
@@ -9,13 +9,13 @@ import {Button, ButtonGroup, Spinner, Tab, Tabs, Tooltip} from "@nextui-org/reac
 import {ProcessInstanceTimeline} from "./ProcessInstanceTimeline.tsx";
 import {LuArrowLeft, LuCopy, LuRefreshCcw} from "react-icons/lu";
 import {ProcessInstanceVariablesEditor} from "./ProcessInstanceVariablesEditor.tsx";
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
-import {ProcessInstancesListing} from "./ProcessInstancesListing.tsx";
-import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../shared/useProcessInstances.tsx";
-import {useProcessInstanceSource} from "../shared/useProcessInstanceSource.tsx";
+import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
+import {ProcessInstancesListing} from "../listing/ProcessInstancesListing.tsx";
+import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../../shared/useProcessInstances.tsx";
+import {useProcessInstanceSource} from "../../shared/useProcessInstanceSource.tsx";
 import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
-import {SourceUnavailableError} from "./SourceUnavailableError.tsx";
+import {SourceUnavailableError} from "../SourceUnavailableError.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
