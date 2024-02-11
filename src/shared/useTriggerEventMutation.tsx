@@ -4,10 +4,11 @@ import {toFormattedJson} from "../helpers/json.ts";
 
 export type TriggerEventRequest = {
     data: string,
+    endpoint: string,
     extensions?: { [key: string]: string }
 }
 
-export const useTriggerEventMutation = (endpoint: string, event: string) => {
+export const useTriggerEventMutation = (event: string) => {
     return useMutation({
         mutationFn: async (request: TriggerEventRequest) => {
             const payload = {
@@ -20,7 +21,7 @@ export const useTriggerEventMutation = (endpoint: string, event: string) => {
                 ...request.extensions
             };
 
-            await fetch(endpoint, {
+            await fetch(request.endpoint, {
                 method: "post",
                 body: toFormattedJson(payload)
             });
