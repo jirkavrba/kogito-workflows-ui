@@ -1,17 +1,27 @@
-import {FC, useEffect, useRef} from "react";
-import {instance} from "@viz-js/viz";
-import {buildGraphvizSourceFromJson} from "../../helpers/graph.ts";
-import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
+import { FC, useEffect, useMemo, useRef } from "react";
+import { instance } from "@viz-js/viz";
+import { buildGraphvizSourceFromJson } from "../../helpers/graph.ts";
+import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
+import { ProcessInstanceTimelineItem } from "../../types/ProcessInstance.ts";
 
 export type ProcessInstanceGraphProps = {
     source: string;
+    timeline: Array<ProcessInstanceTimelineItem>;
     selectedNode: string | null;
     selectedNodeTimestamp: Date | null;
 }
 
-export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, selectedNode = null, selectedNodeTimestamp = null}) => {
+export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({ source, timeline, selectedNode = null, selectedNodeTimestamp = null }) => {
     const transform = useRef<ReactZoomPanPinchRef | null>(null);
     const container = useRef<HTMLDivElement | null>(null);
+
+    const timelineIterations = useMemo<Record<string, number>>(() =>
+        timeline.reduce((acc, current) => {
+            const iteration = acc[current.name] ?? 0;
+            return { ...acc, [current.name]: (iteration + 1) }
+        }, {} as Record<string, number>),
+        [timeline]
+    );
 
     useEffect(() => {
         const { current } = container;
@@ -21,7 +31,7 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
 
         instance().then(viz => {
             const svg = viz.renderSVGElement(
-                buildGraphvizSourceFromJson(source)
+                buildGraphvizSourceFromJson(source, timelineIterations)
             );
 
             svg.style.aspectRatio = `${svg.style.width.replace("dt", "")}/${svg.style.height.replace("dt", "")}`
@@ -36,12 +46,12 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
         });
 
         return () => {
-            const {current} = container;
+            const { current } = container;
             if (current) {
                 current.innerHTML = ""
             }
         };
-    }, [source, container]);
+    }, [source, timelineIterations, container]);
 
     useEffect(() => {
         const node = document.getElementById(`node-${selectedNode}`) as HTMLElement | null;
@@ -71,7 +81,7 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, sel
         <div className="w-full h-[70vh] flex flex-col [&>*]:w-full">
             <TransformWrapper ref={transform}>
                 <TransformComponent>
-                    <div className="w-full h-[70vh]" ref={container}/>
+                    <div className="w-full h-[70vh]" ref={container} />
                 </TransformComponent>
             </TransformWrapper>
         </div>

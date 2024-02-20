@@ -21,15 +21,35 @@ const resolveTransition = (transition: TransitionRef | undefined): string => {
     return transition.nextState;
 }
 
-const buildEventState = (state: EventStateDefinition) => {
-   const definition  = `${state.name} [id = "node-${state.name}", shape = box, color = "#fde047", fontcolor="#fef9c3", label = "⚡ ${state.name}"]`;
+const iterationColor = (iteration: number): string => {
+    if (iteration === 0) {
+        return "#000000"
+    }
+
+    const pool = [
+        "#450a0a",
+        "#422006",
+        "#1a2e05",
+        "#022c22",
+        "#083344",
+        "#172554",
+        "#2e1065",
+        "#500724"
+    ];
+
+    return pool[(iteration - 1) % pool.length];
+};
+
+
+const buildEventState = (state: EventStateDefinition, iteration: number = 0) => {
+   const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fde047", fontcolor="#fef9c3", label = "    ⚡ ${state.name} / ${iteration}    "]`;
    const transition = `${state.name} -> ${resolveTransition(state.transition)} [taillabel = "${state.onEvents?.flatMap(it => it.eventRefs).join(", ")}"]`
 
    return [definition, transition].join("\n");
 }
 
-const buildOperationState = (state: OperationStateDefinition) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, color = "#67e8f9", fontcolor="#cffafe", label = "🛠️ ${state.name}"]`;
+const buildOperationState = (state: OperationStateDefinition, iteration: number = 0) => {
+    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#67e8f9", fontcolor="#cffafe", label = "    🛠️ ${state.name} / ${iteration}    "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
     const onErrorTransitions = state.onErrors?.map(error =>
         `${state.name} -> ${resolveTransition(error.transition)} [color = "#f43f5e", fontcolor = "#fda4af", style = dashed, label="⚠️ ${error.errorRef}"]`
@@ -38,29 +58,29 @@ const buildOperationState = (state: OperationStateDefinition) => {
     return [definition, transition, ...onErrorTransitions].join("\n");
 }
 
-const buildInjectState = (state: InjectStateDefinition) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, color = "#a3e635", fontcolor = "#d9f99d", label = "💉 ${state.name}"]`;
+const buildInjectState = (state: InjectStateDefinition, iteration: number = 0) => {
+    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#a3e635", fontcolor = "#d9f99d", label = "    💉 ${state.name} / ${iteration}     "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
-const buildCallbackState = (state: CallbackState) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, color = "#fb923c", fontcolor="#fed7aa", label = "🛎️ ${state.name}"]`;
+const buildCallbackState = (state: CallbackState, iteration: number = 0) => {
+    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fb923c", fontcolor="#fed7aa", label = "    🛎️ ${state.name} / ${iteration}     "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
-const buildForeachState = (state: ForeachState) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, color = "#713f12", fontcolor="#fed7aa", label = "🔄 ${state.name}"]`;
+const buildForeachState = (state: ForeachState, iteration: number = 0) => {
+    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#713f12", fontcolor="#fed7aa", label = "    🔄 ${state.name} / ${iteration}    "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
-const buildSwitchState = (state: SwitchStateDefinition) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = hexagon, color = "#4ade80", fontcolor="#bbf7d0", label = "❔ ${state.name}"]`;
+const buildSwitchState = (state: SwitchStateDefinition, iteration: number = 0) => {
+    const definition  = `${state.name} [id = "node-${state.name}", shape = hexagon, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#4ade80", fontcolor="#bbf7d0", label = "    ❔ ${state.name} / ${iteration}    "]`;
     const defaultTransition = `${state.name} -> ${resolveTransition(state.defaultCondition.transition)} [style = dashed, label = "default"]`
 
     const conditionalEventTransitions = state.eventConditions?.map(condition =>
@@ -74,22 +94,22 @@ const buildSwitchState = (state: SwitchStateDefinition) => {
     return [definition, defaultTransition, ...conditionalDataTransitions, ...conditionalEventTransitions].join("\n");
 }
 
-export const buildGraphvizSourceFromJson = (source: string): string => {
+export const buildGraphvizSourceFromJson = (source: string, timelineIterations: Record<string, number>): string => {
     const workflow = JSON.parse(source) as ServerlessWorkflowDefinition;
     const nodes = workflow.states.map(state => {
         switch (state.type) {
             case "event":
-                return buildEventState(state);
+                return buildEventState(state, timelineIterations[state.name] ?? 0);
             case "operation":
-                return buildOperationState(state);
+                return buildOperationState(state, timelineIterations[state.name] ?? 0);
             case "inject":
-                return buildInjectState(state);
+                return buildInjectState(state, timelineIterations[state.name] ?? 0);
             case "switch":
-                return buildSwitchState(state);
+                return buildSwitchState(state, timelineIterations[state.name] ?? 0);
             case "callback":
-                return buildCallbackState(state);
+                return buildCallbackState(state, timelineIterations[state.name] ?? 0);
             case "foreach":
-                return buildForeachState(state);
+                return buildForeachState(state, timelineIterations[state.name] ?? 0);
 
             // TODO: Parallel states!
 
