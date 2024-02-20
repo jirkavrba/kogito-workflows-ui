@@ -169,7 +169,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     : (
                                         sourceCodeIsError
                                             ? <SourceUnavailableError/>
-                                            : <ProcessInstanceGraph source={source} selectedNode={selectedNode} selectedNodeTimestamp={selectedNodeTimestamp}/>
+                                            : <ProcessInstanceGraph 
+                                                source={source} 
+                                                timeline={instance.timeline ?? []}
+                                                selectedNode={selectedNode} 
+                                                selectedNodeTimestamp={selectedNodeTimestamp}
+                                              />
                                     )
                             }
                         </Tab>
@@ -211,7 +216,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                 {
                                     sourceCodeLoading
                                         ? <Spinner/>
-                                        : <ProcessInstanceGraph source={source} selectedNode={selectedNode} selectedNodeTimestamp={selectedNodeTimestamp}/>
+                                        : <ProcessInstanceGraph 
+                                            source={source} 
+                                            timeline={instance.timeline ?? []}
+                                            selectedNode={selectedNode} 
+                                            selectedNodeTimestamp={selectedNodeTimestamp}
+                                          />
                                 }
                             </Tab>
                         </Tabs>
