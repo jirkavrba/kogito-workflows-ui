@@ -85,6 +85,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     </div>
                     {instance.businessKey && (
                         <Tooltip content="Process business key">
+                            <>
                             <ButtonGroup>
                                 {
                                     instance.businessKey.split("#").map(((part, i) =>
@@ -97,6 +98,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     ))
                                 }
                             </ButtonGroup>
+
+                            <Button size="sm" color="primary" className="ml-2" onClick={() => navigator.clipboard.writeText(instance.businessKey!)}>
+                                Copy full business key
+                                <LuCopy/>
+                            </Button>
+                            </>
                         </Tooltip>
                     )}
                 </div>
