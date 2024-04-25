@@ -1,8 +1,9 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useEffect, useMemo, useState} from "react";
 import {ProcessDefinition} from "../../shared/useProcessDefinitions.tsx";
 import {Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
 import {LuRefreshCcw} from "react-icons/lu";
 import {availableProcessInstanceStates, ProcessInstanceState} from "../../types/ProcessInstance.ts";
+import {sortBy} from "lodash";
 
 export type ProcessInstancesFilterState = {
     processNames: Array<string> | null,
@@ -17,8 +18,9 @@ export type ProcessInstancesFilterProps = {
     refresh: () => void;
 };
 
-export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh, initialState }) => {
+export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh, initialState}) => {
     const [state, setState] = useState<ProcessInstancesFilterState>(initialState);
+    const sortedDefinitions = useMemo(() => sortBy(definitions, it => it.name), [definitions]);
 
     useEffect(() => void onChange?.(state), [onChange, state]);
 
@@ -39,7 +41,7 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                                 : event.target.value.split(",")
                         }))
                     }>
-                    {definitions.map((definition) =>
+                    {sortedDefinitions.map((definition) =>
                         <SelectItem key={definition.name} value={definition.name}>
                             {definition.name}
                         </SelectItem>
@@ -71,13 +73,13 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                     placeholder="Fuzzy search is enabled by default"
                     defaultValue={state.businessKey ?? ""}
                     onChange={(event) =>
-                    void setState(current => ({
-                        ...current,
-                        businessKey: event.target.value.trim().length === 0
-                            ? null
-                            : event.target.value
-                    }))
-                }/>
+                        void setState(current => ({
+                            ...current,
+                            businessKey: event.target.value.trim().length === 0
+                                ? null
+                                : event.target.value
+                        }))
+                    }/>
 
                 <Button onClick={refresh} size={"lg"}>
                     <LuRefreshCcw/>

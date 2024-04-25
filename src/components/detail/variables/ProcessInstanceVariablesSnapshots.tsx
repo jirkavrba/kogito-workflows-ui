@@ -5,6 +5,7 @@ import {useLocalStorage} from "usehooks-ts";
 import {WorkflowVariablesSnapshot} from "../../../types/Editors.ts";
 import {formatJson} from "../../../helpers/json.ts";
 import {DiffModal} from "../DiffModal.tsx";
+import {useKeyPress} from "../../../shared/useKeyPress.ts";
 
 export type ProcessInstanceVariablesSnapshotsProps = {
     processName: string;
@@ -32,10 +33,17 @@ export const ProcessInstanceVariablesSnapshots: FC<ProcessInstanceVariablesSnaps
         setSnapshots(current => current.filter(it => it.id !== id));
     }
 
+    useKeyPress("s", () => {
+        createSnapshot();
+    });
+
     return (
         <>
             <div className="mb-3">
-                <Button onClick={createSnapshot}>Create a new snapshot of the workflow variables</Button>
+                <Button onClick={createSnapshot}>
+                    Create a new snapshot of the workflow variables
+                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">S</span>
+                </Button>
                 {workflowSnapshots.map(snapshot =>
                     <ButtonGroup className="mx-2">
                         <Button disabled onPress={() => setSelectedSnapshot(snapshot)} key={snapshot.id}>Snapshot {snapshot.id + 1}</Button>

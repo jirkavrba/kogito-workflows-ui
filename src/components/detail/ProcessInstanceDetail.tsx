@@ -16,6 +16,7 @@ import {useProcessInstanceSource} from "../../shared/useProcessInstanceSource.ts
 import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
 import {SourceUnavailableError} from "../SourceUnavailableError.tsx";
+import {useKeyPress} from "../../shared/useKeyPress.ts";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -58,6 +59,16 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
 
     const {data: sourceResponse, isLoading: sourceCodeLoading, isError: sourceCodeIsError} = useProcessInstanceSource(configuration, instance.id);
     const source = sourceResponse?.sources[0]?.source ?? "";
+
+    useKeyPress("v", () => setSelectedSmallScreenTab("variables"));
+    useKeyPress("c", () => {
+        setSelectedSmallScreenTab("correlations");
+        setSelectedLargeScreenTab("correlations");
+    });
+    useKeyPress("g", () => {
+        setSelectedSmallScreenTab("graph");
+        setSelectedLargeScreenTab("graph");
+    });
 
     return (
         <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>
@@ -148,15 +159,25 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         selectedKey={selectedSmallScreenTab}
                         onSelectionChange={(key) => setSelectedSmallScreenTab(key as string)}
                     >
-                        <Tab key="variables" title="Workflow variables">
-                            <ProcessInstanceVariablesEditor
-                                configuration={configuration}
-                                variables={instance.variables}
-                                processName={instance.processName}
-                                id={instance.id}
+                        <Tab key="variables" title={
+                            <div>
+                                Workflow variables
+                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">V</span>
+                            </div>
+                        }>
+                        <ProcessInstanceVariablesEditor
+                            configuration={configuration}
+                            variables={instance.variables}
+                            processName={instance.processName}
+                            id={instance.id}
                             />
                         </Tab>
-                        <Tab key="correlations" title="Correlated workflows">
+                        <Tab key="correlations" title={
+                            <div>
+                                Correlated workflows
+                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">C</span>
+                            </div>
+                        }>
                             {
                                 correlatedInstancesLoading
                                     ? <Spinner/>
@@ -169,7 +190,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     />
                             }
                         </Tab>
-                        <Tab key="graph" title="Workflow graph">
+                        <Tab key="graph" title={
+                            <div>
+                                Workflow graph
+                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">G</span>
+                            </div>
+                        }>
                             {
                                 sourceCodeLoading
                                     ? <Spinner/>
@@ -205,7 +231,12 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                             selectedKey={selectedLargeScreenTab}
                             onSelectionChange={(key) => setSelectedLargeScreenTab(key as string)}
                         >
-                            <Tab key="correlations" title="Correlated workflows">
+                            <Tab key="correlations" title={
+                                <div>
+                                    Correlated workflows
+                                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">C</span>
+                                </div>
+                            }>
                                 <h2 className="text-xs text-center font-medium uppercase tracking-wide my-4">Correlated workflows</h2>
                                 {
                                     correlatedInstancesLoading
@@ -219,11 +250,16 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                         />
                                 }
                             </Tab>
-                            <Tab key="graph" title="Workflow graph">
+                            <Tab key="graph" title={
+                                <div>
+                                    Workflow graph
+                                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">G</span>
+                                </div>
+                            }>
                                 {
                                     sourceCodeLoading
                                         ? <Spinner/>
-                                        : <ProcessInstanceGraph 
+                                        : <ProcessInstanceGraph
                                             source={source} 
                                             timeline={instance.timeline ?? []}
                                             selectedNode={selectedNode} 

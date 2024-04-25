@@ -5,7 +5,6 @@ import {ServerNavbar} from "../components/servers/ServerNavbar.tsx";
 import {Spinner} from "@nextui-org/react";
 import {useProcessInstance} from "../shared/useProcessInstance.tsx";
 import {ProcessInstanceDetail} from "../components/detail/ProcessInstanceDetail.tsx";
-import { useKeyPress } from "../shared/useKeyPress.ts";
 
 const Loader: FC = () => {
     return (
@@ -29,10 +28,6 @@ export const ProcessInstancePage: FC = () => {
             returnToListing();
         }
     }, [returnToListing, isLoading, instance, error]);
-
-    useKeyPress("ArrowLeft", () => {
-        returnToListing();
-    });
 
     return (
         <>
