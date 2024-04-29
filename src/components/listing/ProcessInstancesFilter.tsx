@@ -1,9 +1,9 @@
 import {FC, useEffect, useMemo, useState} from "react";
 import {ProcessDefinition} from "../../shared/useProcessDefinitions.tsx";
-import {Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
+import {Autocomplete, AutocompleteItem, Button, Card, CardBody, Input, Select, SelectItem} from "@nextui-org/react";
 import {LuRefreshCcw} from "react-icons/lu";
 import {availableProcessInstanceStates, ProcessInstanceState} from "../../types/ProcessInstance.ts";
-import {sortBy} from "lodash";
+import {sortBy, uniqBy} from "lodash";
 
 export type ProcessInstancesFilterState = {
     processNames: Array<string> | null,
@@ -20,7 +20,7 @@ export type ProcessInstancesFilterProps = {
 
 export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh, initialState}) => {
     const [state, setState] = useState<ProcessInstancesFilterState>(initialState);
-    const sortedDefinitions = useMemo(() => sortBy(definitions, it => it.name), [definitions]);
+    const sortedDefinitions = useMemo(() => uniqBy(sortBy(definitions, it => it.name), it => it.name), [definitions]);
 
     useEffect(() => void onChange?.(state), [onChange, state]);
 
@@ -28,26 +28,25 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
         <Card>
             <h1 className="text-xl font-bold text-center my-4">Filter process instances</h1>
             <CardBody className="flex flex-col gap-4">
-                <Select
-                    selectionMode="multiple"
+                <Autocomplete
                     label="Process definition"
                     placeholder="All process definitions"
-                    defaultSelectedKeys={state.processNames?.filter(it => it !== null)}
-                    onChange={(event) =>
+                    defaultItems={state.processNames?.filter(it => it !== null)}
+                    onSelectionChange={(value) => {
+                        const process = sortedDefinitions.find(it => it.id == value)?.name ?? ""
                         void setState(current => ({
                             ...current,
-                            processNames: event.target.value.trim().length === 0
+                            processNames: process.trim().length === 0
                                 ? null
-                                : event.target.value.split(",")
+                                : [process]
                         }))
-                    }>
+                    }}>
                     {sortedDefinitions.map((definition) =>
-                        <SelectItem key={definition.name} value={definition.name}>
+                        <AutocompleteItem key={definition.id} value={definition.name}>
                             {definition.name}
-                        </SelectItem>
+                        </AutocompleteItem>
                     )}
-                </Select>
-
+                </Autocomplete>
                 <Select
                     selectionMode="multiple"
                     label="Process instance states"
