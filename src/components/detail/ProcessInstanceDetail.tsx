@@ -16,7 +16,6 @@ import {useProcessInstanceSource} from "../../shared/useProcessInstanceSource.ts
 import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
 import {SourceUnavailableError} from "../SourceUnavailableError.tsx";
-import {useKeyPress} from "../../shared/useKeyPress.ts";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -56,16 +55,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
 
     const {data: sourceResponse, isLoading: sourceCodeLoading, isError: sourceCodeIsError} = useProcessInstanceSource(configuration, instance.id);
     const source = sourceResponse?.sources[0]?.source ?? "";
-
-    useKeyPress("v", () => setSelectedSmallScreenTab("variables"));
-    useKeyPress("c", () => {
-        setSelectedSmallScreenTab("correlations");
-        setSelectedLargeScreenTab("correlations");
-    });
-    useKeyPress("g", () => {
-        setSelectedSmallScreenTab("graph");
-        setSelectedLargeScreenTab("graph");
-    });
 
     return (
         <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>

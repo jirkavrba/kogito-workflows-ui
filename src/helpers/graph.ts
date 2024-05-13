@@ -1,6 +1,7 @@
 import {
     CallbackState,
-    EventStateDefinition, ForeachState,
+    EventStateDefinition,
+    ForeachState,
     InjectStateDefinition,
     OperationStateDefinition,
     ServerlessWorkflowDefinition,
@@ -22,34 +23,21 @@ const resolveTransition = (transition: TransitionRef | undefined): string => {
 }
 
 const iterationColor = (iteration: number): string => {
-    if (iteration === 0) {
-        return "#000000"
-    }
-
-    const pool = [
-        "#450a0a",
-        "#422006",
-        "#1a2e05",
-        "#022c22",
-        "#083344",
-        "#172554",
-        "#2e1065",
-        "#500724"
-    ];
-
-    return pool[(iteration - 1) % pool.length];
+    return iteration === 0
+        ? "#000000"
+        : "#1a2e05";
 };
 
 
 const buildEventState = (state: EventStateDefinition, iteration: number = 0) => {
-   const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fde047", fontcolor="#fef9c3", label = "    ⚡ ${state.name} / ${iteration}    "]`;
-   const transition = `${state.name} -> ${resolveTransition(state.transition)} [taillabel = "${state.onEvents?.flatMap(it => it.eventRefs).join(", ")}"]`
+    const definition = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fde047", fontcolor="#fef9c3", label = "    ⚡ ${state.name} / ${iteration}    "]`;
+    const transition = `${state.name} -> ${resolveTransition(state.transition)} [taillabel = "${state.onEvents?.flatMap(it => it.eventRefs).join(", ")}"]`
 
-   return [definition, transition].join("\n");
+    return [definition, transition].join("\n");
 }
 
 const buildOperationState = (state: OperationStateDefinition, iteration: number = 0) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#67e8f9", fontcolor="#cffafe", label = "    🛠️ ${state.name} / ${iteration}    "]`;
+    const definition = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#67e8f9", fontcolor="#cffafe", label = "    🛠️ ${state.name} / ${iteration}    "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
     const onErrorTransitions = state.onErrors?.map(error =>
         `${state.name} -> ${resolveTransition(error.transition)} [color = "#f43f5e", fontcolor = "#fda4af", style = dashed, label="⚠️ ${error.errorRef}"]`
@@ -59,28 +47,28 @@ const buildOperationState = (state: OperationStateDefinition, iteration: number 
 }
 
 const buildInjectState = (state: InjectStateDefinition, iteration: number = 0) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#a3e635", fontcolor = "#d9f99d", label = "    💉 ${state.name} / ${iteration}     "]`;
+    const definition = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#a3e635", fontcolor = "#d9f99d", label = "    💉 ${state.name} / ${iteration}     "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildCallbackState = (state: CallbackState, iteration: number = 0) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fb923c", fontcolor="#fed7aa", label = "    🛎️ ${state.name} / ${iteration}     "]`;
+    const definition = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#fb923c", fontcolor="#fed7aa", label = "    🛎️ ${state.name} / ${iteration}     "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildForeachState = (state: ForeachState, iteration: number = 0) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#713f12", fontcolor="#fed7aa", label = "    🔄 ${state.name} / ${iteration}    "]`;
+    const definition = `${state.name} [id = "node-${state.name}", shape = box, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#713f12", fontcolor="#fed7aa", label = "    🔄 ${state.name} / ${iteration}    "]`;
     const transition = `${state.name} -> ${resolveTransition(state.transition)}`
 
     return [definition, transition].join("\n");
 }
 
 const buildSwitchState = (state: SwitchStateDefinition, iteration: number = 0) => {
-    const definition  = `${state.name} [id = "node-${state.name}", shape = hexagon, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#4ade80", fontcolor="#bbf7d0", label = "    ❔ ${state.name} / ${iteration}    "]`;
+    const definition = `${state.name} [id = "node-${state.name}", shape = hexagon, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#4ade80", fontcolor="#bbf7d0", label = "    ❔ ${state.name} / ${iteration}    "]`;
     const defaultTransition = `${state.name} -> ${resolveTransition(state.defaultCondition.transition)} [style = dashed, label = "default"]`
 
     const conditionalEventTransitions = state.eventConditions?.map(condition =>

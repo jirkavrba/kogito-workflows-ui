@@ -5,7 +5,6 @@ import {useLocalStorage} from "usehooks-ts";
 import {WorkflowVariablesSnapshot} from "../../../types/Editors.ts";
 import {formatJson} from "../../../helpers/json.ts";
 import {DiffModal} from "../DiffModal.tsx";
-import {useKeyPress} from "../../../shared/useKeyPress.ts";
 
 export type ProcessInstanceVariablesSnapshotsProps = {
     processName: string;
@@ -32,10 +31,6 @@ export const ProcessInstanceVariablesSnapshots: FC<ProcessInstanceVariablesSnaps
     const deleteSnapshot = (id: number) => {
         setSnapshots(current => current.filter(it => it.id !== id));
     }
-
-    useKeyPress("s", () => {
-        createSnapshot();
-    });
 
     return (
         <>
