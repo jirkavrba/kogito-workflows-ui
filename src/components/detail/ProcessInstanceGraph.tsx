@@ -1,30 +1,29 @@
-import { FC, useEffect, useMemo, useRef } from "react";
-import { instance } from "@viz-js/viz";
-import { buildGraphvizSourceFromJson } from "../../helpers/graph.ts";
-import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-import { ProcessInstanceTimelineItem } from "../../types/ProcessInstance.ts";
+import {FC, useEffect, useMemo, useRef} from "react";
+import {instance} from "@viz-js/viz";
+import {buildGraphvizSourceFromJson} from "../../helpers/graph.ts";
+import {ReactZoomPanPinchRef, TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
+import {ProcessInstanceTimelineItem} from "../../types/ProcessInstance.ts";
 
 export type ProcessInstanceGraphProps = {
     source: string;
     timeline: Array<ProcessInstanceTimelineItem>;
-    selectedNode: string | null;
-    selectedNodeTimestamp: Date | null;
 }
 
-export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({ source, timeline, selectedNode = null, selectedNodeTimestamp = null }) => {
+export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({source, timeline}) => {
+    const firstRender = useRef<boolean>(false);
     const transform = useRef<ReactZoomPanPinchRef | null>(null);
     const container = useRef<HTMLDivElement | null>(null);
 
     const timelineIterations = useMemo<Record<string, number>>(() =>
-        timeline.reduce((acc, current) => {
-            const iteration = acc[current.name] ?? 0;
-            return { ...acc, [current.name]: (iteration + 1) }
-        }, {} as Record<string, number>),
+            timeline.reduce((acc, current) => {
+                const iteration = acc[current.name] ?? 0;
+                return {...acc, [current.name]: (iteration + 1)}
+            }, {} as Record<string, number>),
         [timeline]
     );
 
     useEffect(() => {
-        const { current } = container;
+        const {current} = container;
         if (!current) {
             return;
         }
@@ -34,6 +33,10 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({ source, ti
                 buildGraphvizSourceFromJson(source, timelineIterations)
             );
 
+            if (svg.innerHTML === current.innerHTML) {
+                return;
+            }
+
             svg.style.aspectRatio = `${svg.style.width.replace("dt", "")}/${svg.style.height.replace("dt", "")}`
             svg.style.width = "100%";
             svg.style.maxHeight = "70vh"
@@ -41,47 +44,26 @@ export const ProcessInstanceGraph: FC<ProcessInstanceGraphProps> = ({ source, ti
             current.innerHTML = "";
             current.appendChild(svg);
 
-            transform.current?.resetTransform();
-            transform.current?.centerView();
+            if (!firstRender.current) {
+                transform.current?.resetTransform();
+                transform.current?.centerView();
+                firstRender.current = true;
+            }
         });
 
         return () => {
-            const { current } = container;
+            const {current} = container;
             if (current) {
                 current.innerHTML = ""
             }
         };
     }, [source, timelineIterations, container]);
 
-    useEffect(() => {
-        const node = document.getElementById(`node-${selectedNode}`) as HTMLElement | null;
-
-        if (selectedNode && node) {
-            const polygon = node.querySelector("polygon");
-
-            transform.current?.zoomToElement(node, 1.25);
-
-            if (polygon) {
-                const originalColor = polygon.style.color;
-                const originalFill = polygon.style.fill;
-
-                polygon.style.color = "#000000";
-                polygon.style.fill = "#ffffff";
-
-                setTimeout(() => {
-                    polygon.style.color = originalColor;
-                    polygon.style.fill = originalFill;
-                }, 1000);
-            }
-
-        }
-    }, [selectedNode, selectedNodeTimestamp]);
-
     return (
         <div className="w-full h-[70vh] flex flex-col [&>*]:w-full">
             <TransformWrapper ref={transform}>
                 <TransformComponent>
-                    <div className="w-full h-[70vh]" ref={container} />
+                    <div className="w-full h-[70vh]" ref={container}/>
                 </TransformComponent>
             </TransformWrapper>
         </div>

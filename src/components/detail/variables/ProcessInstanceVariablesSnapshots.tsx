@@ -42,7 +42,6 @@ export const ProcessInstanceVariablesSnapshots: FC<ProcessInstanceVariablesSnaps
             <div className="mb-3">
                 <Button onClick={createSnapshot}>
                     Create a new snapshot of the workflow variables
-                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">S</span>
                 </Button>
                 {workflowSnapshots.map(snapshot =>
                     <ButtonGroup className="mx-2">

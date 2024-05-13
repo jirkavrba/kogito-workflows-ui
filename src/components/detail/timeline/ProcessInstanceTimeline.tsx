@@ -7,7 +7,6 @@ import {
     LuBadgeAlert,
     LuBadgeCheck,
     LuCombine,
-    LuEye, LuEyeOff,
     LuFlag,
     LuFunctionSquare,
     LuSplit,
@@ -52,8 +51,6 @@ type TimelineItemProps = {
     item: ProcessInstanceTimelineItem;
     index: number;
     error: ProcessInstanceError | null;
-    navigationEnabled?: boolean;
-    onGraphNodeSelect?: () => void;
     onEventNodeSelect?: () => void;
 };
 
@@ -62,9 +59,6 @@ const TimelineItem: FC<TimelineItemProps> = (
         item,
         index,
         error,
-        navigationEnabled = false,
-        onGraphNodeSelect = () => {
-        },
         onEventNodeSelect = () => {
         },
     }
@@ -79,21 +73,6 @@ const TimelineItem: FC<TimelineItemProps> = (
                 <div className="min-w-4">
                     <TimelineItemIcon type={item.type} className={completed ? "text-neutral-500" : "text-warning"}/>
                 </div>
-                {navigationEnabled && (
-                    ["CompositeContextNode", "Split"].includes(item.type)
-                        ? (
-                            <Button size="sm" isIconOnly onPress={onGraphNodeSelect}>
-                                <LuEye/>
-                            </Button>
-                        )
-                        : (
-                            <Tooltip content="Graph navigation is not supported for this type of node">
-                                <Button size="sm" isIconOnly disabled={true} variant="bordered">
-                                    <LuEyeOff/>
-                                </Button>
-                            </Tooltip>
-                        )
-                )}
                 <div className="flex flex-col justify-start items-start flex-grow">
                     <div className={`flex flex-row justify-start items-center gap-1 text-sm font-medium`}>
                         {completed && <div className="text-success"><LuBadgeCheck/></div>}
@@ -138,8 +117,6 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
         serviceUrl,
         configuration,
         timeline,
-        timelineNavigationEnabled = false,
-        onTimelineItemSelect = () => {},
         error
     }
 ) => {
@@ -190,8 +167,6 @@ export const ProcessInstanceTimeline: FC<ProcessInstanceTimelineProps> = (
                             key={index}
                             index={newestFirst ? (sortedTimeline.length - index) : (index + 1)}
                             error={error}
-                            navigationEnabled={timelineNavigationEnabled}
-                            onGraphNodeSelect={() => onTimelineItemSelect(item.name)}
                             onEventNodeSelect={() => setSelectedEventTrigger(item.name)}
                         />
                     )}

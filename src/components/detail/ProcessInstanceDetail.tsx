@@ -30,9 +30,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
     const [selectedSmallScreenTab, setSelectedSmallScreenTab] = useLocalStorage("small-screen-tab", "graph");
     const [selectedLargeScreenTab, setSelectedLargeScreenTab] = useLocalStorage("large-screen-tab", "correlations");
 
-    const [selectedNode, setSelectedNode] = useState<string | null>(null)
-    const [selectedNodeTimestamp, setSelectedNodeTimestamp] = useState<Date>(new Date());
-
     const [correlatedWorkflowsPage, setCorrelatedWorkflowsPage] = useState(0);
     const loadNextPage = () => setCorrelatedWorkflowsPage(current => current + 1);
     const loadPreviousPage = () => setCorrelatedWorkflowsPage(current => Math.max(current - 1, 0));
@@ -97,23 +94,23 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     {instance.businessKey && (
                         <Tooltip content="Process business key">
                             <>
-                            <ButtonGroup>
-                                {
-                                    instance.businessKey.split("#").map(((part, i) =>
-                                            <>
-                                                <Button key={i} size="sm" onClick={() => navigator.clipboard.writeText(part)}>
-                                                    {part}
-                                                    <LuCopy/>
-                                                </Button>
-                                            </>
-                                    ))
-                                }
-                            </ButtonGroup>
+                                <ButtonGroup>
+                                    {
+                                        instance.businessKey.split("#").map(((part, i) =>
+                                                <>
+                                                    <Button key={i} size="sm" onClick={() => navigator.clipboard.writeText(part)}>
+                                                        {part}
+                                                        <LuCopy/>
+                                                    </Button>
+                                                </>
+                                        ))
+                                    }
+                                </ButtonGroup>
 
-                            <Button size="sm" color="primary" className="ml-2" onClick={() => navigator.clipboard.writeText(instance.businessKey!)}>
-                                Copy full business key
-                                <LuCopy/>
-                            </Button>
+                                <Button size="sm" color="primary" className="ml-2" onClick={() => navigator.clipboard.writeText(instance.businessKey!)}>
+                                    Copy full business key
+                                    <LuCopy/>
+                                </Button>
                             </>
                         </Tooltip>
                     )}
@@ -141,14 +138,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         serviceUrl={instance.serviceUrl}
                         timeline={instance.timeline}
                         error={instance.error}
-                        onTimelineItemSelect={(id) => {
-                            setSelectedNode(id);
-                            setSelectedNodeTimestamp(new Date());
-                        }}
-                        timelineNavigationEnabled={
-                            selectedSmallScreenTab === "graph" ||
-                            selectedLargeScreenTab === "graph"
-                        }
                     />
                 </div>
 
@@ -162,20 +151,18 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         <Tab key="variables" title={
                             <div>
                                 Workflow variables
-                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">V</span>
                             </div>
                         }>
-                        <ProcessInstanceVariablesEditor
-                            configuration={configuration}
-                            variables={instance.variables}
-                            processName={instance.processName}
-                            id={instance.id}
+                            <ProcessInstanceVariablesEditor
+                                configuration={configuration}
+                                variables={instance.variables}
+                                processName={instance.processName}
+                                id={instance.id}
                             />
                         </Tab>
                         <Tab key="correlations" title={
                             <div>
                                 Correlated workflows
-                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">C</span>
                             </div>
                         }>
                             {
@@ -193,7 +180,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                         <Tab key="graph" title={
                             <div>
                                 Workflow graph
-                                <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">G</span>
                             </div>
                         }>
                             {
@@ -202,12 +188,10 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     : (
                                         sourceCodeIsError
                                             ? <SourceUnavailableError/>
-                                            : <ProcessInstanceGraph 
-                                                source={source} 
+                                            : <ProcessInstanceGraph
+                                                source={source}
                                                 timeline={instance.timeline ?? []}
-                                                selectedNode={selectedNode} 
-                                                selectedNodeTimestamp={selectedNodeTimestamp}
-                                              />
+                                            />
                                     )
                             }
                         </Tab>
@@ -234,7 +218,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                             <Tab key="correlations" title={
                                 <div>
                                     Correlated workflows
-                                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">C</span>
                                 </div>
                             }>
                                 <h2 className="text-xs text-center font-medium uppercase tracking-wide my-4">Correlated workflows</h2>
@@ -253,18 +236,15 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                             <Tab key="graph" title={
                                 <div>
                                     Workflow graph
-                                    <span className="ml-3 bg-white bg-opacity-10 px-2 py-0.5 rounded font-mono font-black">G</span>
                                 </div>
                             }>
                                 {
                                     sourceCodeLoading
                                         ? <Spinner/>
                                         : <ProcessInstanceGraph
-                                            source={source} 
+                                            source={source}
                                             timeline={instance.timeline ?? []}
-                                            selectedNode={selectedNode} 
-                                            selectedNodeTimestamp={selectedNodeTimestamp}
-                                          />
+                                        />
                                 }
                             </Tab>
                         </Tabs>
