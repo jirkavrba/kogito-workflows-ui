@@ -40,7 +40,7 @@ const buildStringArgumentFilter = (
 
     return {
         [property]: {
-            like: `*${name}*`
+            like: name
         }
     }
 };
