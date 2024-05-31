@@ -69,7 +69,9 @@ const buildForeachState = (state: ForeachState, iteration: number = 0) => {
 
 const buildSwitchState = (state: SwitchStateDefinition, iteration: number = 0) => {
     const definition = `${state.name} [id = "node-${state.name}", shape = hexagon, style = filled, fillcolor = "${iterationColor(iteration)}", color = "#4ade80", fontcolor="#bbf7d0", label = "    ❔ ${state.name} / ${iteration}    "]`;
-    const defaultTransition = `${state.name} -> ${resolveTransition(state.defaultCondition.transition)} [style = dashed, label = "default"]`
+    const defaultTransition = state.defaultCondition ? (
+    `${state.name} -> ${resolveTransition(state.defaultCondition.transition)} [style = dashed, label = "default"]`
+    ) : "";
 
     const conditionalEventTransitions = state.eventConditions?.map(condition =>
         `${state.name} -> ${resolveTransition(condition.transition)} [label = "⚡ ${condition.eventRef}", color = "#A59430", fontcolor="#FFF3AA"]`
