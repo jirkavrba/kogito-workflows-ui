@@ -9,7 +9,7 @@ import {Spinner} from "@nextui-org/react";
 import {useProcessDefinitions} from "../shared/useProcessDefinitions.tsx";
 import {ProcessInstancesFilter} from "../components/listing/ProcessInstancesFilter.tsx";
 import {ProcessInstanceState} from "../types/ProcessInstance.ts";
-import {LuGitlab} from "react-icons/lu";
+import {LuGithub} from "react-icons/lu";
 import {version} from "../version.ts";
 
 const Loader: FC = () => {
@@ -76,10 +76,10 @@ export const ServerPage: FC = () => {
                             version {version}
                         </span>
                         <span className="text-neutral-500">
-                            <LuGitlab/>
+                            <LuGithub/>
                         </span>
                         <span className="text-xs">
-                            <a href="https://gitlab.com/jirkavrba/kogito-workflows-ui" target="_blank" className="text-neutral-700 hover:text-orange-500">
+                            <a href="https://github.com/jirkavrba/kogito-workflows-ui" target="_blank" className="text-neutral-700 hover:text-orange-500">
                                 Source code
                             </a>
                         </span>

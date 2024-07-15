@@ -2,7 +2,7 @@ import {FC} from "react";
 import {version} from "../version";
 import {ServerConfigurationSelection} from "../components/servers/ServerConfigurationSelection.tsx";
 import {useNavigate} from "react-router-dom";
-import {LuGitlab} from "react-icons/lu";
+import {LuGithub} from "react-icons/lu";
 
 export const DefaultPage: FC = () => {
     const navigate = useNavigate();
@@ -21,10 +21,10 @@ export const DefaultPage: FC = () => {
             <div className="flex flex-row justify-center items-center my-2 gap-2 mt-5">
                 <span className="text-xs text-neutral-700">&copy; Jiří Vrba {new Date().getFullYear()}</span>
                 <span className="text-neutral-500">
-                    <LuGitlab/>
+                    <LuGithub/>
                 </span>
                 <span className="text-xs">
-                    <a href="https://gitlab.com/jirkavrba/kogito-workflows-ui" target="_blank" className="text-neutral-700 hover:text-orange-500">
+                    <a href="https://github.com/jirkavrba/kogito-workflows-ui" target="_blank" className="text-neutral-700 hover:text-orange-500">
                         Version {version}
                     </a>
                 </span>
