@@ -12,11 +12,13 @@ There is an instance of the application running on [kogito.vrba.dev](https://kog
 
 ## Running the application yourself
 
+<!--
 The simplest way to run the application is to use a pre-built docker image hosted on Gitlab.
 
 ```
 docker run -p 8080:80 -it registry.gitlab.com/jirkavrba/kogito-workflows-ui
 ```
+-->
 
 To build the application from scratch, clone the repository, build docker image locally and run it.
 
@@ -28,4 +30,4 @@ docker build -t kogito-workflows-ui -f ./docker/Dockerfile .
 docker run -p 8080:80 -it kogito-workflows-ui
 ```
 
-The application will be then running on [localhost:8080](http://localhost:8080). 
+he application will be then running on [localhost:8080](http://localhost:8080). 
