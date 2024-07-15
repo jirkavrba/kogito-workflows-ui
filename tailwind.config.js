@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       screens: {
-        '2k': '2560px'
+        'fullhd': '1900px' // Adjusted for window borders etc
       }
     },
   },

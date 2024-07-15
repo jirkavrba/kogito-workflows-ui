@@ -119,7 +119,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     </Button>
                 </div>
             </header>
-            <main className="grid grid-row grid-cols-4 2k:grid-cols-5 flex-grow gap-4">
+            <main className="grid grid-row grid-cols-4 fullhd:grid-cols-5 flex-grow gap-4">
                 <div>
                     <ProcessInstanceTimeline
                         id={instance.id}
@@ -130,7 +130,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     />
                 </div>
 
-                <div className="col-span-3 2k:hidden">
+                <div className="col-span-3 fullhd:hidden">
                     <Tabs
                         color="primary"
                         variant="solid"
@@ -187,7 +187,7 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                     </Tabs>
                 </div>
 
-                <div className="hidden grid-cols-2 col-span-4 2k:grid">
+                <div className="hidden grid-cols-2 col-span-4 fullhd:grid">
                     <div>
                         <ProcessInstanceVariablesEditor
                             variables={instance.variables}
