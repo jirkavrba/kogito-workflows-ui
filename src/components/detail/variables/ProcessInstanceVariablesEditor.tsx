@@ -104,7 +104,8 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                     lineNumbers: "off",
                     theme: "vs-dark",
                     contextmenu: false,
-                    cursorSmoothCaretAnimation: "on"
+                    cursorSmoothCaretAnimation: "on",
+                    stickyScroll: true
                 }}
                 height="70vh"
             />
