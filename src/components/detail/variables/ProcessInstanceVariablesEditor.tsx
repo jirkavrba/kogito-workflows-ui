@@ -103,9 +103,15 @@ export const ProcessInstanceVariablesEditor: FC<ProcessInstanceVariablesEditorPr
                 options={{
                     lineNumbers: "off",
                     theme: "vs-dark",
+                    language: "json",
                     contextmenu: false,
                     cursorSmoothCaretAnimation: "on",
-                    stickyScroll: true
+                    stickyScroll: {
+                        enabled: true,
+                        scrollWithEditor: true,
+                        defaultModel: "foldingProviderModel",
+                        maxLineCount: 10
+                    }
                 }}
                 height="70vh"
             />
