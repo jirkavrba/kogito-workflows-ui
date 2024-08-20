@@ -5,6 +5,7 @@ import {ServerNavbar} from "../components/servers/ServerNavbar.tsx";
 import {Spinner} from "@nextui-org/react";
 import {useProcessInstance} from "../shared/useProcessInstance.tsx";
 import {ProcessInstanceDetail} from "../components/detail/ProcessInstanceDetail.tsx";
+import { useFeatureEnabled } from "../shared/useSettings.tsx";
 
 const Loader: FC = () => {
     return (
@@ -17,7 +18,8 @@ const Loader: FC = () => {
 export const ProcessInstancePage: FC = () => {
     const {connection, processInstanceId} = useParams();
     const configuration = useServerConfiguration(connection ?? "");
-    const {data: response, isLoading, error, refetch} = useProcessInstance(configuration, processInstanceId ?? "");
+    const variablesEnabled = useFeatureEnabled("variables");
+    const {data: response, isLoading, error, refetch} = useProcessInstance(configuration, processInstanceId ?? "", variablesEnabled);
     const [instance] = response?.instances ?? [];
 
     const navigate = useNavigate();

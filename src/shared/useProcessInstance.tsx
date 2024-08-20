@@ -1,30 +1,31 @@
-import {ServerConfiguration} from "../types/ServerConfiguration.ts";
-import {gql, GraphQLClient} from "graphql-request";
-import {useQuery} from "@tanstack/react-query";
-import {ProcessInstance} from "../types/ProcessInstance.ts";
+import { ServerConfiguration } from "../types/ServerConfiguration.ts";
+import { gql, GraphQLClient } from "graphql-request";
+import { useQuery } from "@tanstack/react-query";
+import { ProcessInstance } from "../types/ProcessInstance.ts";
 
 export type ProcessInstanceResponse = {
-    instances: Array<ProcessInstance>
+  instances: Array<ProcessInstance>
 }
 
 export type ProcessInstanceRequest = {
-    id: string;
+  id: string;
 }
 
 export const useProcessInstance = (
-    configuration: ServerConfiguration,
-    instanceId: string,
+  configuration: ServerConfiguration,
+  instanceId: string,
+  includeVariables: boolean = false
 ) => {
-    const client = new GraphQLClient(configuration.url)
-    return useQuery({
-        queryKey: [`instances#${configuration.id}#${instanceId}`],
-        refetchInterval: 5000,
-        refetchIntervalInBackground: true,
-        queryFn: async () => {
-            return await client.request<
-                ProcessInstanceResponse,
-                ProcessInstanceRequest
-            >(gql`
+  const client = new GraphQLClient(configuration.url)
+  return useQuery({
+    queryKey: [`instances#${configuration.id}#${instanceId}#${includeVariables ? "with-variables" : "without-variables"}`],
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+    queryFn: async () => {
+      return await client.request<
+        ProcessInstanceResponse,
+        ProcessInstanceRequest
+      >(gql`
                 query findProcessInstance($id: String!) {
                   instances: ProcessInstances(
                     where: {
@@ -52,15 +53,15 @@ export const useProcessInstance = (
                     }
                     state
                     start
-                    variables
+                    ${includeVariables ? "variables" : ""}
                     lastUpdate
                     endpoint
                     serviceUrl
                   }
                 }
             `, {
-                id: instanceId
-            })
-        }
-    })
+        id: instanceId
+      })
+    }
+  })
 }
