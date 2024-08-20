@@ -12,10 +12,7 @@ import {ProcessInstanceVariablesEditor} from "./variables/ProcessInstanceVariabl
 import {ServerConfiguration} from "../../types/ServerConfiguration.ts";
 import {ProcessInstancesListing} from "../listing/ProcessInstancesListing.tsx";
 import {defaultProcessInstancesRequest, processInstancesPerPage, useProcessInstances} from "../../shared/useProcessInstances.tsx";
-import {useProcessInstanceSource} from "../../shared/useProcessInstanceSource.tsx";
-import {ProcessInstanceGraph} from "./ProcessInstanceGraph.tsx";
 import {useLocalStorage} from "usehooks-ts";
-import {SourceUnavailableError} from "../SourceUnavailableError.tsx";
 
 export type ProcessInstanceDetailProps = {
     instance: ProcessInstance;
@@ -52,9 +49,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
         },
         offset: correlatedWorkflowsPage * processInstancesPerPage
     });
-
-    const {data: sourceResponse, isLoading: sourceCodeLoading, isError: sourceCodeIsError} = useProcessInstanceSource(configuration, instance.id);
-    const source = sourceResponse?.sources[0]?.source ?? "";
 
     return (
         <div className={`${stateBorderColors[instance.state]} flex flex-col items-stretch justify-start border-t-4 p-8`}>
@@ -166,24 +160,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                     />
                             }
                         </Tab>
-                        <Tab key="graph" title={
-                            <div>
-                                Workflow graph
-                            </div>
-                        }>
-                            {
-                                sourceCodeLoading
-                                    ? <Spinner/>
-                                    : (
-                                        sourceCodeIsError
-                                            ? <SourceUnavailableError/>
-                                            : <ProcessInstanceGraph
-                                                source={source}
-                                                timeline={instance.timeline ?? []}
-                                            />
-                                    )
-                            }
-                        </Tab>
                     </Tabs>
                 </div>
 
@@ -219,20 +195,6 @@ export const ProcessInstanceDetail: FC<ProcessInstanceDetailProps> = ({instance,
                                             page={correlatedWorkflowsPage}
                                             loadNextPage={loadNextPage}
                                             loadPreviousPage={loadPreviousPage}
-                                        />
-                                }
-                            </Tab>
-                            <Tab key="graph" title={
-                                <div>
-                                    Workflow graph
-                                </div>
-                            }>
-                                {
-                                    sourceCodeLoading
-                                        ? <Spinner/>
-                                        : <ProcessInstanceGraph
-                                            source={source}
-                                            timeline={instance.timeline ?? []}
                                         />
                                 }
                             </Tab>
