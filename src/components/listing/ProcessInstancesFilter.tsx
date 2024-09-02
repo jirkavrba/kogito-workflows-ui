@@ -20,7 +20,7 @@ export type ProcessInstancesFilterProps = {
 
 export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definitions, onChange, refresh, initialState}) => {
     const [state, setState] = useState<ProcessInstancesFilterState>(initialState);
-    const sortedDefinitions = useMemo(() => uniqBy(sortBy(definitions, it => it.name), it => it.name), [definitions]);
+    const sortedDefinitions = useMemo(() => uniqBy(sortBy(definitions, it => it.id), it => it.id), [definitions]);
 
     useEffect(() => void onChange?.(state), [onChange, state]);
 
@@ -33,7 +33,7 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                     placeholder="All process definitions"
                     defaultItems={state.processNames?.filter(it => it !== null)}
                     onSelectionChange={(value) => {
-                        const process = sortedDefinitions.find(it => it.id == value)?.name ?? ""
+                        const process = sortedDefinitions.find(it => it.id == value)?.id ?? ""
                         void setState(current => ({
                             ...current,
                             processNames: process.trim().length === 0
@@ -42,8 +42,8 @@ export const ProcessInstancesFilter: FC<ProcessInstancesFilterProps> = ({definit
                         }))
                     }}>
                     {sortedDefinitions.map((definition) =>
-                        <AutocompleteItem key={definition.id} value={definition.name}>
-                            {definition.name}
+                        <AutocompleteItem key={definition.id} value={definition.id}>
+                            {definition.id}
                         </AutocompleteItem>
                     )}
                 </Autocomplete>
