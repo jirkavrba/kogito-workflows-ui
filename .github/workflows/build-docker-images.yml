@@ -37,3 +37,4 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           tags: ghcr.io/jirkavrba/kogito-workflows-ui:latest,ghcr.io/jirkavrba/kogito-workflows-ui:${{github.ref_name}}
+          platforms: linux/amd64,linux/arm64
