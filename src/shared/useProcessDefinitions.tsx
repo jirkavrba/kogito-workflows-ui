@@ -1,6 +1,7 @@
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {gql, GraphQLClient} from "graphql-request";
 import {useQuery} from "@tanstack/react-query";
+import {resolveAuthenticationHeaders} from "../helpers/headers.ts";
 
 
 export type ProcessDefinitionsResponse = {
@@ -14,7 +15,7 @@ export type ProcessDefinition = {
 }
 
 export const useProcessDefinitions = (configuration: ServerConfiguration) => {
-    const client = new GraphQLClient(configuration.url)
+    const client = new GraphQLClient(configuration.url, {headers: resolveAuthenticationHeaders(configuration)});
     return useQuery({
         queryKey: [`definitions#${configuration.id}`],
         queryFn: async () => {

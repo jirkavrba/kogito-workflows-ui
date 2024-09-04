@@ -22,6 +22,7 @@ const slug = (value: string): string => {
 export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isOpen, onOpenChange, onSubmit}) => {
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
+    const [authorization, setAuthorization] = useState("");
 
     const submit = () => {
         if (!name || !url) {
@@ -32,10 +33,12 @@ export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isO
             id: slug(name),
             name: name,
             url: url,
+            authorizationHeader: authorization
         }
 
         setName("");
         setUrl("")
+        setAuthorization("");
         onSubmit(configuration);
     }
 
@@ -58,6 +61,13 @@ export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isO
                                 placeholder="https://example-data-index.com/graphql"
                                 value={url}
                                 onChange={(event) => setUrl(event.target.value)}
+                                onKeyDown={(event) => (event.key === "Enter") && submit()}
+                            />
+                            <Input
+                                label="Authorization header (optional)"
+                                placeholder="Basic Y3VzIGJ1cyBrYWt0dXM="
+                                value={authorization}
+                                onChange={(event) => setAuthorization(event.target.value)}
                                 onKeyDown={(event) => (event.key === "Enter") && submit()}
                             />
                         </ModalBody>
