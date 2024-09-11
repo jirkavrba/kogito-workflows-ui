@@ -1,13 +1,15 @@
 import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 
-export const resolveAuthenticationHeaders = (configuration: ServerConfiguration): { Authorization: string } | undefined => {
-    const header = configuration.authorizationHeader?.trim()
+export const resolveConfiguredHeaders = (configuration: ServerConfiguration): { Authorization?: string, Host?: string } | undefined => {
+    const authorization = configuration.authorizationHeader?.trim();
+    const host = configuration.overriddenHostHeader?.trim();
 
-    if (!header || header.length === 0) {
+    if ((!authorization && !host) || (authorization?.length === 0 && host?.length === 0)) {
         return undefined;
     }
 
     return {
-        Authorization: header
+        Authorization: authorization,
+        Host: host,
     }
 }

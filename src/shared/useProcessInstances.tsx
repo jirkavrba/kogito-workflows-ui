@@ -2,7 +2,7 @@ import {ServerConfiguration} from "../types/ServerConfiguration.ts";
 import {gql, GraphQLClient} from "graphql-request";
 import {useQuery} from "@tanstack/react-query";
 import {AggregatedProcessInstance, availableProcessInstanceStates, ProcessInstanceArgument, ProcessInstanceState} from "../types/ProcessInstance.ts";
-import {resolveAuthenticationHeaders} from "../helpers/headers.ts";
+import {resolveConfiguredHeaders} from "../helpers/headers.ts";
 
 export type AggregatedProcessInstancesResponse = {
     instances: Array<AggregatedProcessInstance>
@@ -70,7 +70,8 @@ export const useProcessInstances = (
     configuration: ServerConfiguration,
     request: AggregatedProcessInstancesRequest = defaultProcessInstancesRequest
 ) => {
-    const client = new GraphQLClient(configuration.url, {headers: resolveAuthenticationHeaders(configuration)});
+    const headers = resolveConfiguredHeaders(configuration);
+    const client = new GraphQLClient(configuration.url, {headers});
 
     return useQuery({
         queryKey: [`instances#${configuration.id}`, request],
@@ -111,7 +112,7 @@ export const useProcessInstances = (
                     }
                   }
                 }
-            `, request)
+            `, request, headers)
         }
     })
 }

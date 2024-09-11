@@ -23,6 +23,7 @@ export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isO
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
     const [authorization, setAuthorization] = useState("");
+    const [host, setHost] = useState("");
 
     const submit = () => {
         if (!name || !url) {
@@ -33,12 +34,14 @@ export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isO
             id: slug(name),
             name: name,
             url: url,
-            authorizationHeader: authorization
+            authorizationHeader: authorization,
+            overriddenHostHeader: host,
         }
 
         setName("");
         setUrl("")
         setAuthorization("");
+        setHost("");
         onSubmit(configuration);
     }
 
@@ -68,6 +71,13 @@ export const ServerConfigurationModal: FC<ServerConfigurationModalProps> = ({isO
                                 placeholder="Basic Y3VzIGJ1cyBrYWt0dXM="
                                 value={authorization}
                                 onChange={(event) => setAuthorization(event.target.value)}
+                                onKeyDown={(event) => (event.key === "Enter") && submit()}
+                            />
+                            <Input
+                                label="Overridden host header (optional)"
+                                placeholder="https://example.com"
+                                value={host}
+                                onChange={(event) => setHost(event.target.value)}
                                 onKeyDown={(event) => (event.key === "Enter") && submit()}
                             />
                         </ModalBody>

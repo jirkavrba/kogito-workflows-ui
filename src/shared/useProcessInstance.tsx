@@ -2,7 +2,7 @@ import { ServerConfiguration } from "../types/ServerConfiguration.ts";
 import { gql, GraphQLClient } from "graphql-request";
 import { useQuery } from "@tanstack/react-query";
 import { ProcessInstance } from "../types/ProcessInstance.ts";
-import {resolveAuthenticationHeaders} from "../helpers/headers.ts";
+import {resolveConfiguredHeaders} from "../helpers/headers.ts";
 
 export type ProcessInstanceResponse = {
   instances: Array<ProcessInstance>
@@ -17,7 +17,7 @@ export const useProcessInstance = (
   instanceId: string,
   includeVariables: boolean = false
 ) => {
-  const client = new GraphQLClient(configuration.url, {headers: resolveAuthenticationHeaders(configuration)});
+  const client = new GraphQLClient(configuration.url, {headers: resolveConfiguredHeaders(configuration)});
   return useQuery({
     queryKey: [`instances#${configuration.id}#${instanceId}#${includeVariables ? "with-variables" : "without-variables"}`],
     refetchInterval: 5000,

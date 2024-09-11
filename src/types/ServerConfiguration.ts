@@ -3,4 +3,5 @@ export type ServerConfiguration = {
     readonly name: string;
     readonly url: string;
     readonly authorizationHeader?: string;
+    readonly overriddenHostHeader?: string;
 };
