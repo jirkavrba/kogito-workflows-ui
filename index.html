@@ -17,7 +17,9 @@
             registration.unregister();
         } 
 
-        if (registrations.length > 0) {
+        const reloaded = window.localStorage.getItem("reloaded");
+        if (reloaded !== "true") {
+          window.localStorage.setItem("reloaded", "true");
           location.reload();
         }
       });
