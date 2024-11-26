@@ -11,5 +11,16 @@
   <body style="display: flex; flex-flow: column nowrap; align-items: center; justify-content: center; width: 100vw; min-height: 100vh;">
     <img src="/bg.jpg"/>
     <a href="https://loan-vrbito.internal.dev.pbk-lab.tech/" style="color: white; font-size: 1rem; margin-top: 2rem; font-family: monospace;">👉 https://loan-vrbito.internal.dev.pbk-lab.tech 👈</a>
+    <script>
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (const registration of registrations) {
+            registration.unregister();
+        } 
+
+        if (registrations.length > 0) {
+          location.reload();
+        }
+      });
+    </script>
   </body>
 </html>
